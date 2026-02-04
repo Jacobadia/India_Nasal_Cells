@@ -7,5 +7,5 @@ srun run_trimmomatic.sh
 srun run_fastqc.sh
 
 # This will aggregate all FastQC reports into a single MultiQC report
-# Will will look at this report to determine if further cleaning is necessary
+# We will look at this report to determine if further cleaning is necessary
 srun run_multiqc.sh
