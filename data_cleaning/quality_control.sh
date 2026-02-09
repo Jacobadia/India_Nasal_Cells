@@ -17,3 +17,4 @@ trimmomatic.sh
 fastqc_trimmed.sh
 
 # run multiQC. If we decide to add this
+run_multiqc.sh
