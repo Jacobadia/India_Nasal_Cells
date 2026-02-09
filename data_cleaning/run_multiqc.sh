@@ -1,3 +1,4 @@
 #!/usr/bin/env bash
 
-multiqc .
+cd /grphome/grp_tb/processing_scripts/results
+multiqc trimmed/ -o documents/
