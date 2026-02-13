@@ -8,12 +8,13 @@
 # output file we want to create.
 # We also only need to run this once
 
-fastq_dir="/home/${USER}/groups/grp_tb/fastq"
+fastq_dir="/grphome/grp_tb/fastqB"
 output_file="sample_array_ids.txt"
 
 i=1
-for r1filename in "${fastq_dir}"/*_R1.fastq.gz; do
-    r2filename="${r1filename/_R1.fastq.gz/_R2.fastq.gz}"
-    echo "${i}"$'\t'"${r1filename}"$'\t'"${r2filename}" >> $output_file
+for r1filename in "${fastq_dir}"/*.trim.paired_r1.fastq.gz; do
+    r2filename="${r1filename/.trim.paired_r1.fastq.gz/.trim.paired_r2.fastq.gz}"
+    sample_name=$(basename "${r1filename}" .trim.paired_r1.fastq.gz)
+    echo "${sample_name}"$'\t'"${sample_name}.trim.paired_r1.fastq.gz"$'\t'"${sample_name}.trim.paired_r2.fastq.gz" >> $output_file
     ((i++))
 done
