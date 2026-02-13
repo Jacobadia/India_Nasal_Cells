@@ -45,6 +45,8 @@ echo "$HOSTNAME"
 
 temp_dir="/grphome/grp_tb/trimmed_temp/${sample_name}"
 
+mkdir -p "$temp_dir"
+
 cp /grphome/grp_tb/processing_scripts/results/trimmed/${read_1} "$temp_dir"
 cp /grphome/grp_tb/processing_scripts/results/trimmed/${read_2} "$temp_dir"
 echo "Temporary Directory: $temp_dir"
