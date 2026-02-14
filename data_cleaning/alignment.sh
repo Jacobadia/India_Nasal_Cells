@@ -92,7 +92,7 @@ samtools view -bS "$temp_dir/Aligned.out.sam" > "$temp_dir/Aligned.out.bam"
 echo "### SAM converted successfully ###"
 
 echo "### cleaning up: deleting SAM file ###"
-rm "$temp_dir/Aligned.out.sam"
+# rm "$temp_dir/Aligned.out.sam"
 echo "### deleted SAM successfully ###"
 
 echo "# Sort BAM and index"
