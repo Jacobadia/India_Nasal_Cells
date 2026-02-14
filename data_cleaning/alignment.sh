@@ -5,7 +5,7 @@
 #SBATCH --mail-user=18briankim@gmail.com        # Where to send mail
 #SBATCH --cpus-per-task=28                      # Number of CPU cores per task
 #SBATCH --mem=160gb                             # Total memory
-#SBATCH --time=48:00:00                         # Time limit hrs:min:sec
+#SBATCH --time=72:00:00                         # Time limit hrs:min:sec
 #SBATCH --output=/grphome/grp_tb/processing_scripts/alignment_tb.out   # Standard output and error log
 #SBATCH --array=1-79                            # Create an array of jobs (one for each sample)
 
