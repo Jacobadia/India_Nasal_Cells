@@ -40,3 +40,12 @@ library(pls)
 ### machine learnig models ###
 
 #### Figures  ####
+
+
+
+##notes
+    #Three pipelines 1. 80 all 2. 80 feature 65 train, 14 test 3. 14 feature, 50 train, 15 test
+    #function for each model ethan
+    #modling data frame function jacob
+    #find overlap function ethan
+    #variable importance function jacob
