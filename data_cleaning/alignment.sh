@@ -102,7 +102,7 @@ echo "### BAM sorted and indexed successfully ###"
 
 echo "# tidying up #"
 # Move outputs to the results directories
-results_dir="/projects/f_wj183_1/data/2024_uganda_ped_nasal/results/star_output"
+results_dir="/grphome/grp_tb/processing_scripts/results/star_output"
 mv "$temp_dir/Aligned.out.sorted.bam" "$results_dir/alignments/${sample_name}.sorted.bam"
 mv "$temp_dir/Aligned.out.sorted.bam.bai" "$results_dir/alignments/${sample_name}.sorted.bam.bai"
 mv "$temp_dir/Log.final.out" "$results_dir/logs/${sample_name}.txt"
