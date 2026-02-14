@@ -112,6 +112,6 @@ mv "$temp_dir/ReadsPerGene.out.tab" "$results_dir/counts/${sample_name}.txt"
 echo "# $sample_name completed alignment #"
 
 echo "## clean temporary directory ##"
-rm -rf $temp_dir
+# rm -rf $temp_dir
 
 echo "# $HOSTNAME or projects temp directory deleted successfully #"
