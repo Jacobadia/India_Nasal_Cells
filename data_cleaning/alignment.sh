@@ -18,7 +18,7 @@
 
 echo "### Setting paths ###"
 # Set paths
-data_path="/grphome/grp_tb/processing_scripts/results/trimmed"
+data_path="/grphome/grp_tb/processing_scripts/results/trimmed_cp"
 sample_sheet="/grphome/grp_tb/processing_scripts/results/documents/sample_array_ids.txt"
 
 echo "Data Path: $data_path"
