@@ -4,7 +4,6 @@
 #SBATCH --mail-type=BEGIN,END,FAIL
 #SBATCH --output=/grphome/grp_tb/processing_scripts/genome_index.out
 #SBATCH --mail-user=bryant.steed@gmail.com
-#SBATCH --mail-user=18briankim@gmail.com
 #SBATCH --time=24:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=22
@@ -19,6 +18,9 @@ annotations_gtf="/grphome/grp_tb/star_genome/gencode.v49.primary_assembly.annota
 # script on our samples and got 151 every time
 overhang=150
 
+mkdir -p "${genome_index_dir}"
+
+source ~/miniconda3/etc/profile.d/conda.sh
 conda_environment="star_aligner"
 
 if [ ! -r "$genome_fasta" ]; then

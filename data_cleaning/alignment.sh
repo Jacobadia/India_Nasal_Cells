@@ -20,11 +20,9 @@ echo "### Setting paths ###"
 # Set paths
 data_path="/grphome/grp_tb/processing_scripts/results/trimmed"
 sample_sheet="/grphome/grp_tb/processing_scripts/results/documents/sample_array_ids.txt"
-project_backup_dir="/projects/f_wj183_1/data/2024_uganda_ped_nasal/tmp_backup"
 
 echo "Data Path: $data_path"
 echo "Sample Sheet: $sample_sheet"
-echo "Project back up: $project_backup_dir"
 
 # Read the specific line of the sample sheet corresponding to the task ID
 sample=$(sed -n "${SLURM_ARRAY_TASK_ID}p" $sample_sheet)
@@ -67,18 +65,26 @@ conda activate star_aligner
 
 echo "# running STAR #"
 # Run STAR alignment
-STAR --genomeDir /grphome/grp_tb/processing_scripts/grch38 \
---sjdbGTFfile /projects/f_wj183_1/data/2024_uganda_ped_nasal/genome/gencode.v44.primary_assembly.annotation.gtf \
---runThreadN 28 \
+
+annotations_gtf="/grphome/grp_tb/star_genome/gencode.v49.primary_assembly.annotation.gtf"
+genome_index_dir="/grphome/grp_tb/star_genome/index"
+max_locations_mapped_to=1
+max_mismatches_per_read=10
+
+STAR \
+--genomeDir "$genome_index_dir" \
+--sjdbGTFfile "$annotations_gtf" \
+--runThreadN "${SLURM_CPUS_PER_TASK}" \
 --quantMode GeneCounts \
---outFilterMultimapNmax 1 \
---readFilesIn "$temp_dir/temp_1.fq" "$temp_dir/temp_2.fq" \
+--outFilterMultimapNmax "$max_locations_mapped_to" \
+--outFilterMismatchNmax "$max_mismatches_per_read" \
+--readFilesIn "$temp_dir/$unzipped_read_1" "$temp_dir/$unzipped_read_2" \
 --outFileNamePrefix "$temp_dir/"
 
 echo "### cleaning up: deleting unzipped FASTQ files ###"
 # Delete the unzipped FASTQ files to free up space
-rm "$temp_dir/temp_1.fq"
-rm "$temp_dir/temp_2.fq"
+rm "$temp_dir/$unzipped_read_1"
+rm "$temp_dir/$unzipped_read_2"
 echo "### cleaned out fastq successfully ###"
 
 echo "# Convert SAM to BAM #"
