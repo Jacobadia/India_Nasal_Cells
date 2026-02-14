@@ -19,7 +19,7 @@ annotations_gtf="/grphome/grp_tb/star_genome/gencode.v49.primary_assembly.annota
 # script on our samples and got 151 every time
 overhang=150
 
-conda_environment="tb_processing"
+conda_environment="star_aligner"
 
 if [ ! -r "$genome_fasta" ]; then
     echo "Error: Genome FASTA file not found or not readable: $genome_fasta"
