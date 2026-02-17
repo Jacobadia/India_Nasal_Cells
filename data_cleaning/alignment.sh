@@ -61,6 +61,7 @@ unzipped_read_2="${read_2%.gz}"
 
 echo "### load STAR and related packages ###"
 # Load STAR and samtools
+source ~/miniconda3/etc/profile.d/conda.sh
 conda activate star_aligner
 
 echo "# running STAR #"
@@ -102,6 +103,8 @@ echo "### BAM sorted and indexed successfully ###"
 
 echo "# tidying up #"
 # Move outputs to the results directories
+mkdir -p "$results_dir/alignments" "$results_dir/logs" "$results_dir/counts"
+
 results_dir="/grphome/grp_tb/processing_scripts/results/star_output"
 mv "$temp_dir/Aligned.out.sorted.bam" "$results_dir/alignments/${sample_name}.sorted.bam"
 mv "$temp_dir/Aligned.out.sorted.bam.bai" "$results_dir/alignments/${sample_name}.sorted.bam.bai"
