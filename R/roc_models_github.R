@@ -21,6 +21,36 @@ library(pls)
 
 ### modling data frame ###
 
+prepare_nasal_data <- function(counts_path, coldata_path) {
+
+  counts_data <- read.csv(counts_path, header = TRUE, row.names = 1)
+  coldata <- read.csv(coldata_path, header = TRUE, row.names = 1)
+
+  coldata <- coldata %>%
+    dplyr::mutate(
+      status = factor(status, levels = c("control", "case")),
+      sex = factor(sex, levels = c("male", "female"))
+    )
+
+  counts_data <- as.matrix(counts_data)
+
+  batch <- factor(coldata$sex)
+  sample_group <- factor(coldata$status)
+
+  counts_corrected <- ComBat_seq(
+    counts_data,
+    batch = batch,
+    group = sample_group
+  )
+
+  return(list(
+    counts_raw = counts_data,
+    counts_corrected = counts_corrected,
+    coldata = coldata
+  ))
+}
+
+
 # Convert to matrix
 
 # DESeqq2, matrix -> DESeqq object for machine learing
@@ -30,6 +60,16 @@ library(pls)
 ### machine learnig models ###
 
 ### Variable importance
+
+plot_importance <- function(fit, model_name, top = 10) {
+  imp <- varImp(fit)
+  ggplot(imp, top = top) +
+    theme_SL2() +
+    ggtitle(paste("Top", top, "Genes by Importance in", model_name)) +
+    xlab("Genes") +
+    ylab("Variable Importance") +
+    theme(axis.text.x = element_text(size = 16, angle = 45, hjust = 1))
+}
 
 #Generate importance plots
 
