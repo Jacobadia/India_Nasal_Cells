@@ -22,7 +22,10 @@ def process_line(line):
     attributes.split(";")
     attribute_dict = {}
     for attribute in attributes.split(";"):
-        key, value = attribute.strip().split(" ", 1)
+        attribute = attribute.strip()
+        if not attribute:
+            continue
+        key, value = attribute.split(" ", 1)
         attribute_dict[key] = value.strip('"')
     gene_id = attribute_dict.get("gene_id", "NA")
     gene_type = attribute_dict.get("gene_type", "NA")
