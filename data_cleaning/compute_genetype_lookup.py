@@ -1,4 +1,4 @@
-#!usr/bin/env python3
+#!/usr/bin/env python3
 
 gtf_file = "/grphome/grp_tb/star_genome/gencode.v49.primary_assembly.annotation.gtf"
 output_file = "/grphome/grp_tb/processing_scripts/results/documents/genetype_lookup.txt"
