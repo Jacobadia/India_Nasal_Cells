@@ -3,6 +3,8 @@
 gtf_file = "/grphome/grp_tb/star_genome/gencode.v49.primary_assembly.annotation.gtf"
 output_file = "/grphome/grp_tb/processing_scripts/results/documents/genetype_lookup.txt"
 
+# TODO: Add the field conversion for id to gene_name
+
 def is_qualified_entry(line, fields):
     if line.startswith("#"):
         return False
