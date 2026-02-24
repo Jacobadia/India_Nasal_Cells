@@ -30,17 +30,20 @@ def process_line(line):
         key, value = attribute.split(" ", 1)
         attribute_dict[key] = value.strip('"')
     gene_id = attribute_dict.get("gene_id", "NA")
+    gene_name = attribute_dict.get("gene_name", "NA")
     gene_type = attribute_dict.get("gene_type", "NA")
     if gene_id == "NA":
         print("Warning: gene_id not found in attributes, skipping line")
         return
     if gene_type == "NA":
         print(f"Warning: gene_type not found for gene_id {gene_id}, setting it to NA")
-    write_output(gene_id, gene_type)
+    if gene_name == "NA":
+        print(f"Warning: gene_name not found for gene_id {gene_id}, setting it to NA")
+    write_output(gene_id, gene_name, gene_type)
 
-def write_output(gene_id, gene_type):
+def write_output(gene_id, gene_name, gene_type):
     with open(output_file, "a") as f:
-        f.write(f"{gene_id}\t{gene_type}\n")
+        f.write(f"{gene_id}\t{gene_name}\t{gene_type}\n")
 
 def main():
     with open(gtf_file) as f:
