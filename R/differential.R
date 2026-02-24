@@ -33,7 +33,7 @@ counts <- counts[non_zero_genes, ]
 # Filter out genes that are not protein coding
 
 genetype_lookup <- read.delim("genetype_lookup.txt", header = FALSE, stringsAsFactors = FALSE)
-colnames(genetype_lookup) <- c("gene_id", "gene_type")
+colnames(genetype_lookup) <- c("gene_id", "gene_name", "gene_type")
 
 # Keep only protein coding genes
 protein_coding_genes <- genetype_lookup$gene_id[genetype_lookup$gene_type == "protein_coding"]
