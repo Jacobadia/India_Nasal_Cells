@@ -7,9 +7,10 @@
 library(DESeq2)
 
 counts <- read.delim(
-  "gene_counts_matrix.txt",
+  "gene_counts_corrected.tsv",
   row.names = 1,
-  comment.char = "#"
+  comment.char = "#",
+  check.names = FALSE
 )
 
 counts <- counts[, 6:ncol(counts)]
@@ -20,7 +21,17 @@ condition <- ifelse(grepl("LB", sample_names), "latent",
                     ifelse(grepl("LA", sample_names), "active", NA))
 condition <- factor(condition, levels = c("latent", "active"))
 
-conditionData <- data.frame(condition = condition)
+# Load the tsv of Sex and Age data
+metadata <- read.delim("metadata.tsv", header = TRUE, stringsAsFactors = FALSE)
+
+ordering <- match(sample_names, metadata$Nasal.ID)
+
+sex <- metadata$Sex[ordering]
+sex <- factor(sex, levels = c("Male", "Female"))
+age_raw <- metadata$Age[ordering]
+age_scaled <- scale(age_raw)
+
+conditionData <- data.frame(condition = condition, sex = sex, age = age_scaled)
 rownames(conditionData) <- sample_names
 
 # Filter out genes with no counts
@@ -42,9 +53,10 @@ non_protein_coding_genes <- length(unique(rownames(counts))) - length(protein_co
 print(paste("Number of non-protein coding genes:", non_protein_coding_genes))
 counts <- counts[rownames(counts) %in% protein_coding_genes, ]
 
+
 dds <- DESeqDataSetFromMatrix(countData = counts,
                               colData = conditionData,
-                              design = ~ condition)
+                              design = ~ sex + condition)
 
 dds <- DESeq(dds)
 res <- results(dds)
