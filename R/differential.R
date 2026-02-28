@@ -6,8 +6,15 @@
 # BiocManager::install("DESeq2")
 library(DESeq2)
 
+matrix_counts_file <- "../artifacts/gene_counts_corrected.tsv"
+metadata_file <- "../artifacts/metadata.tsv"
+gene_type_file <- "../artifacts/genetype_lookup.txt"
+
+full_deg_results_file <- "../artifacts/deg_results_full.txt"
+significant_deg_results_file <- "../artifacts/deg_results_significant.txt"
+
 counts <- read.delim(
-  "gene_counts_corrected.tsv",
+  matrix_counts_file,
   row.names = 1,
   comment.char = "#",
   check.names = FALSE
@@ -22,7 +29,7 @@ condition <- ifelse(grepl("LB", sample_names), "latent",
 condition <- factor(condition, levels = c("latent", "active"))
 
 # Load the tsv of Sex and Age data
-metadata <- read.delim("metadata.tsv", header = TRUE, stringsAsFactors = FALSE)
+metadata <- read.delim(metadata_file, header = TRUE, stringsAsFactors = FALSE)
 
 ordering <- match(sample_names, metadata$Nasal.ID)
 
@@ -43,7 +50,7 @@ counts <- counts[non_zero_genes, ]
 
 # Filter out genes that are not protein coding
 
-genetype_lookup <- read.delim("genetype_lookup.txt", header = FALSE, stringsAsFactors = FALSE)
+genetype_lookup <- read.delim(gene_type_file, header = FALSE, stringsAsFactors = FALSE)
 colnames(genetype_lookup) <- c("gene_id", "gene_name", "gene_type")
 
 # Keep only protein coding genes
@@ -64,10 +71,10 @@ res <- results(dds)
 res <- res[!is.na(res$padj), ]
 res_filtered <- res[base::order(res$padj), ]
 
-write.table(res_filtered, "deg_results_full.txt",
+write.table(res_filtered, full_deg_results_file,
             sep = "\t", quote = FALSE, row.names = TRUE)
 
 res_filtered <- res_filtered[res_filtered$padj < 0.05, ]
 
-write.table(res_filtered, "deg_results_significant.txt",
+write.table(res_filtered, significant_deg_results_file,
             sep = "\t", quote = FALSE, row.names = TRUE)
