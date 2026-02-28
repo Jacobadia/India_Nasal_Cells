@@ -61,9 +61,14 @@ print(paste("Number of non-protein coding genes:", non_protein_coding_genes))
 counts <- counts[rownames(counts) %in% protein_coding_genes, ]
 
 
+# keep only that have an average count of at least 10 across all samples
+average_counts <- rowMeans(counts)
+counts <- counts[average_counts >= 10, ]
+
+
 dds <- DESeqDataSetFromMatrix(countData = counts,
                               colData = conditionData,
-                              design = ~ sex + condition)
+                              design = ~ condition)
 
 dds <- DESeq(dds)
 res <- results(dds)

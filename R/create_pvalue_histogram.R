@@ -1,6 +1,6 @@
 library(ggplot2)
 
-output_plot_name <- "pvalue_histogram_controlling_for_sex"
+output_plot_name <- "pvalue_histogram"
 
 # Load the full DEG results
 full_deg_results_file <- "../artifacts/deg_results_full.txt"
@@ -12,7 +12,7 @@ deg_results <- read.delim(full_deg_results_file, header = TRUE, stringsAsFactors
 histogram_plot <- ggplot(deg_results, aes(x = pvalue)) +
   geom_histogram(binwidth = 0.05, fill = "blue", color = "white", boundary = 0) +
   scale_x_continuous(limits = c(0, 1), expand = c(0, 0)) +
-  labs(title = "Histogram of p-values from DESeq2 analysis Controlling for Sex",
+  labs(title = "Histogram of p-values from DESeq2 analysis",
        x = "p-value",
        y = "Frequency") +
   theme_minimal() +
