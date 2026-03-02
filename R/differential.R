@@ -26,21 +26,38 @@ counts <- filter_protein_coding_genes(counts, genetype_lookup)
 
 counts <- filter_mean_counts(counts, 10)
 
+run_deg_analysis <- function(counts, conditionData, design_formula) {
+  dds <- DESeqDataSetFromMatrix(countData = counts,
+                                colData = conditionData,
+                                design = design_formula)
 
-dds <- DESeqDataSetFromMatrix(countData = counts,
-                              colData = conditionData,
-                              design = ~ condition)
+  dds <- DESeq(dds)
+  res <- results(dds)
 
-dds <- DESeq(dds)
-res <- results(dds)
+  res <- res[!is.na(res$padj), ]
+  res_filtered <- res[base::order(res$padj), ]
 
-res <- res[!is.na(res$padj), ]
-res_filtered <- res[base::order(res$padj), ]
+  write.table(res_filtered, full_deg_results_file,
+              sep = "\t", quote = FALSE, row.names = TRUE)
 
-write.table(res_filtered, full_deg_results_file,
-            sep = "\t", quote = FALSE, row.names = TRUE)
+  res_filtered <- res_filtered[res_filtered$padj < 0.05, ]
 
-res_filtered <- res_filtered[res_filtered$padj < 0.05, ]
+  write.table(res_filtered, significant_deg_results_file,
+              sep = "\t", quote = FALSE, row.names = TRUE)
+}
 
-write.table(res_filtered, significant_deg_results_file,
-            sep = "\t", quote = FALSE, row.names = TRUE)
+run_deg_no_control <- function(counts, conditionData) {
+  run_deg_analysis(counts, conditionData, ~ condition)
+}
+
+run_deg_control_sex <- function(counts, conditionData) {
+  run_deg_analysis(counts, conditionData, ~ sex + condition)
+}
+
+run_deg_control_age <- function(counts, conditionData) {
+  run_deg_analysis(counts, conditionData, ~ age + condition)
+}
+
+run_deg_control_sex_and_age <- function(counts, conditionData) {
+  run_deg_analysis(counts, conditionData, ~ sex + age + condition)
+}
