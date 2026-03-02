@@ -34,12 +34,6 @@ get_condition_data <- function(counts, metadata_file) {
   return(conditionData)
 }
 
-get_counts_and_condition_data <- function(matrix_counts_file, metadata_file) {
-  counts <- get_counts_data(matrix_counts_file)
-  conditionData <- get_condition_data(counts, metadata_file)
-  return(list(counts = counts, conditionData = conditionData))
-}
-
 get_genetype_lookup <- function(gene_type_file) {
   # parse gene type information
   print(paste("Loading gene type lookup from:", gene_type_file))

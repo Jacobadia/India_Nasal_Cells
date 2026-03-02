@@ -15,9 +15,8 @@ gene_type_file <- "../artifacts/genetype_lookup.txt"
 full_deg_results_file <- "../artifacts/deg_results_full.txt"
 significant_deg_results_file <- "../artifacts/deg_results_significant.txt"
 
-get_counts_and_condition_data_output <- get_counts_and_condition_data(matrix_counts_file, metadata_file)
-counts <- get_counts_and_condition_data_output$counts
-conditionData <- get_counts_and_condition_data_output$conditionData
+counts <- get_counts_data(matrix_counts_file)
+conditionData <- get_condition_data(counts, metadata_file)
 
 genetype_lookup <- get_genetype_lookup(gene_type_file)
 counts <- filter_total_counts(counts, 0)
@@ -26,7 +25,8 @@ counts <- filter_protein_coding_genes(counts, genetype_lookup)
 
 counts <- filter_mean_counts(counts, 10)
 
-run_deg_analysis <- function(counts, conditionData, design_formula) {
+run_deg_analysis <- function(counts, conditionData, design_formula, 
+full_deg_results_file, significant_deg_results_file) {
   dds <- DESeqDataSetFromMatrix(countData = counts,
                                 colData = conditionData,
                                 design = design_formula)
@@ -46,18 +46,24 @@ run_deg_analysis <- function(counts, conditionData, design_formula) {
               sep = "\t", quote = FALSE, row.names = TRUE)
 }
 
-run_deg_no_control <- function(counts, conditionData) {
-  run_deg_analysis(counts, conditionData, ~ condition)
+run_deg_control_nothing <- function(counts, conditionData) {
+  run_deg_analysis(counts, conditionData, ~ condition, 
+  full_deg_results_file, significant_deg_results_file)
 }
 
 run_deg_control_sex <- function(counts, conditionData) {
-  run_deg_analysis(counts, conditionData, ~ sex + condition)
+  run_deg_analysis(counts, conditionData, ~ sex + condition, 
+  full_deg_results_file, significant_deg_results_file)
 }
 
 run_deg_control_age <- function(counts, conditionData) {
-  run_deg_analysis(counts, conditionData, ~ age + condition)
+  run_deg_analysis(counts, conditionData, ~ age + condition, 
+  full_deg_results_file, significant_deg_results_file)
 }
 
 run_deg_control_sex_and_age <- function(counts, conditionData) {
-  run_deg_analysis(counts, conditionData, ~ sex + age + condition)
+  run_deg_analysis(counts, conditionData, ~ sex + age + condition, 
+  full_deg_results_file, significant_deg_results_file)
 }
+
+run_deg_control_nothing(counts, conditionData)
