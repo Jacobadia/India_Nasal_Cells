@@ -1,4 +1,5 @@
 get_counts_data <- function(matrix_counts_file) {
+  print(paste("Loading counts data from:", matrix_counts_file))
   counts <- read.delim(
     matrix_counts_file,
     row.names = 1,
@@ -11,6 +12,7 @@ get_counts_data <- function(matrix_counts_file) {
 }
 
 get_condition_data <- function(counts, metadata_file) {
+  print(paste("Loading metadata from:", metadata_file))
   sample_names <- colnames(counts)
 
   condition <- ifelse(grepl("LB", sample_names), "latent",
@@ -36,4 +38,12 @@ get_counts_and_condition_data <- function(matrix_counts_file, metadata_file) {
   counts <- get_counts_data(matrix_counts_file)
   conditionData <- get_condition_data(counts, metadata_file)
   return(list(counts = counts, conditionData = conditionData))
+}
+
+get_genetype_lookup <- function(gene_type_file) {
+  # parse gene type information
+  print(paste("Loading gene type lookup from:", gene_type_file))
+  genetype_lookup <- read.delim(gene_type_file, header = FALSE, stringsAsFactors = FALSE)
+  colnames(genetype_lookup) <- c("gene_id", "gene_name", "gene_type")
+  return(genetype_lookup)
 }

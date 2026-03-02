@@ -25,10 +25,7 @@ print(paste("Number of genes with no counts:", sum(zero_genes)))
 print(paste("Number of genes with counts:", sum(non_zero_genes)))
 counts <- counts[non_zero_genes, ]
 
-# Filter out genes that are not protein coding
-
-genetype_lookup <- read.delim(gene_type_file, header = FALSE, stringsAsFactors = FALSE)
-colnames(genetype_lookup) <- c("gene_id", "gene_name", "gene_type")
+genetype_lookup <- get_genetype_lookup(gene_type_file)
 
 # Keep only protein coding genes
 protein_coding_genes <- genetype_lookup$gene_id[genetype_lookup$gene_type == "protein_coding"]
