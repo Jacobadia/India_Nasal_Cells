@@ -6,6 +6,7 @@
 # BiocManager::install("DESeq2")
 library(DESeq2)
 source("./parse_counts.R")
+source("./filtration.R")
 
 matrix_counts_file <- "../artifacts/gene_counts_corrected.tsv"
 metadata_file <- "../artifacts/metadata.tsv"
@@ -18,14 +19,8 @@ get_counts_and_condition_data_output <- get_counts_and_condition_data(matrix_cou
 counts <- get_counts_and_condition_data_output$counts
 conditionData <- get_counts_and_condition_data_output$conditionData
 
-# Filter out genes with no counts
-non_zero_genes <- rowSums(counts) > 0
-zero_genes <- rowSums(counts) <= 0
-print(paste("Number of genes with no counts:", sum(zero_genes)))
-print(paste("Number of genes with counts:", sum(non_zero_genes)))
-counts <- counts[non_zero_genes, ]
-
 genetype_lookup <- get_genetype_lookup(gene_type_file)
+counts <- filter_total_counts(counts, 0)
 
 # Keep only protein coding genes
 protein_coding_genes <- genetype_lookup$gene_id[genetype_lookup$gene_type == "protein_coding"]
