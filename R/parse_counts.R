@@ -1,4 +1,4 @@
-get_counts_and_condition_data <- function(matrix_counts_file, metadata_file) {
+get_counts_data <- function(matrix_counts_file) {
   counts <- read.delim(
     matrix_counts_file,
     row.names = 1,
@@ -7,7 +7,10 @@ get_counts_and_condition_data <- function(matrix_counts_file, metadata_file) {
   )
 
   counts <- counts[, 6:ncol(counts)]
+  return (counts)
+}
 
+get_condition_data <- function(counts, metadata_file) {
   sample_names <- colnames(counts)
 
   condition <- ifelse(grepl("LB", sample_names), "latent",
@@ -26,5 +29,11 @@ get_counts_and_condition_data <- function(matrix_counts_file, metadata_file) {
 
   conditionData <- data.frame(condition = condition, sex = sex, age = age_scaled)
   rownames(conditionData) <- sample_names
-  return (list(counts = counts, conditionData = conditionData))
+  return(conditionData)
+}
+
+get_counts_and_condition_data <- function(matrix_counts_file, metadata_file) {
+  counts <- get_counts_data(matrix_counts_file)
+  conditionData <- get_condition_data(counts, metadata_file)
+  return(list(counts = counts, conditionData = conditionData))
 }
