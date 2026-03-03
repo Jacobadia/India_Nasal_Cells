@@ -36,3 +36,29 @@ filter_protein_mean_counts <- function(counts, genetype_lookup, threshold) {
   counts <- filter_mean_counts(counts, threshold)
   return (counts)
 }
+
+filter_out_hemoglobin_genes <- function(counts, hemoglobin_lookup) {
+  # Remove hemoglobin genes
+  # Strip version suffix (e.g. ENSG00000244734.3 -> ENSG00000244734) before matching
+  base_ids <- gsub("\\.[0-9]+$", "", rownames(counts))
+  hemoglobin_gene_ids <- hemoglobin_lookup$Ensembl.gene.ID
+  passing_genes <- !base_ids %in% hemoglobin_gene_ids
+  failing_genes <- base_ids %in% hemoglobin_gene_ids
+  print(paste("Number of hemoglobin genes:", sum(failing_genes)))
+  print(paste("Number of non-hemoglobin genes:", sum(passing_genes)))
+  counts <- counts[passing_genes, ]
+  return(counts)
+}
+
+filter_protein_hemoglobin <- function(counts, genetype_lookup, hemoglobin_lookup) {
+  counts <- filter_total_counts(counts, 0)
+  counts <- filter_protein_coding_genes(counts, genetype_lookup)
+  counts <- filter_out_hemoglobin_genes(counts, hemoglobin_lookup)
+  return (counts)
+}
+
+filter_protein_hemoglobin_mean_counts <- function(counts, genetype_lookup, hemoglobin_lookup, threshold) {
+  counts <- filter_protein_hemoglobin(counts, genetype_lookup, hemoglobin_lookup)
+  counts <- filter_mean_counts(counts, threshold)
+  return (counts)
+}

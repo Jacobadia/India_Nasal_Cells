@@ -41,3 +41,9 @@ get_genetype_lookup <- function(gene_type_file) {
   colnames(genetype_lookup) <- c("gene_id", "gene_name", "gene_type")
   return(genetype_lookup)
 }
+
+get_hemoglobin_lookup <- function(hemoglobin_file) {
+  print(paste("Loading hemoglobin gene lookup from:", hemoglobin_file))
+  hemoglobin_genes <- read.delim(hemoglobin_file, header = TRUE, stringsAsFactors = FALSE)
+  return(hemoglobin_genes)
+}

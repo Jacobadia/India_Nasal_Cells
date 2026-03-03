@@ -1,0 +1,1 @@
+According to https://www.genenames.org/data/genegroup/#!/group/940, those genes are hemoglobin genes for the purposes of our exclusion methodology

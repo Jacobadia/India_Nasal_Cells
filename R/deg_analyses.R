@@ -7,6 +7,7 @@ artifacts_dir <- "../artifacts/"
 matrix_counts_file <- paste0(artifacts_dir, "gene_counts_corrected.tsv")
 metadata_file <- paste0(artifacts_dir, "metadata.tsv")
 gene_type_file <- paste0(artifacts_dir, "genetype_lookup.txt")
+hemoglobin_file <- paste0(artifacts_dir, "hemoglobin_genes.tsv")
 
 create_test_func <- function(matrix_counts_file, metadata_file, gene_type_file, dir_name, deg_function, filter_function) {
     return (function() {
@@ -103,6 +104,26 @@ protein_mean_100_control_age_and_sex <- create_test_func(matrix_counts_file, met
     return (filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 100))
 })
 
+protein_hemoglobin_control_nothing <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
+"protein_hemoglobin_control_nothing", run_deg_control_nothing, function(counts, gene_type_file) {
+    return (filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
+})
+
+protein_hemoglobin_control_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
+"protein_hemoglobin_control_sex", run_deg_control_sex, function(counts, gene_type_file) {
+    return (filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
+})
+
+protein_hemoglobin_control_age <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
+"protein_hemoglobin_control_age", run_deg_control_age, function(counts, gene_type_file) {
+    return (filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
+})
+
+protein_hemoglobin_control_age_and_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
+"protein_hemoglobin_control_age_and_sex", run_deg_control_sex_and_age, function(counts, gene_type_file) {
+    return (filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
+})
+
 
 pure_no_control()
 pure_control_sex()
@@ -112,6 +133,10 @@ protein_control_nothing()
 protein_control_sex()
 protein_control_age()
 protein_control_age_and_sex()
+protein_hemoglobin_control_nothing()
+protein_hemoglobin_control_sex()
+protein_hemoglobin_control_age()
+protein_hemoglobin_control_age_and_sex()
 protein_mean_10_control_nothing()
 protein_mean_10_control_sex()
 protein_mean_10_control_age()
