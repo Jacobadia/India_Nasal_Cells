@@ -62,3 +62,46 @@ filter_protein_hemoglobin_mean_counts <- function(counts, genetype_lookup, hemog
   counts <- filter_mean_counts(counts, threshold)
   return (counts)
 }
+
+# Log2(CPM + 1) transform: normalize each sample to counts per million, then apply log2(x + 1)
+lpm_cpm_transform <- function(counts) {
+  library_sizes <- colSums(counts)
+  cpm <- sweep(counts, 2, library_sizes, FUN = "/") * 1e6
+  return(log2(cpm + 1))
+}
+
+# Complementary functions that apply log per million transform before filtering
+lpm_filter_pure <- function(counts) {
+  counts <- lpm_cpm_transform(counts)
+  return(counts)
+}
+
+lpm_filter_protein_coding <- function(counts, genetype_lookup) {
+  counts <- filter_total_counts(counts, 0)
+  counts <- filter_protein_coding_genes(counts, genetype_lookup)
+  counts <- lpm_cpm_transform(counts)
+  return(counts)
+}
+
+lpm_filter_protein_mean_counts <- function(counts, genetype_lookup, threshold) {
+  counts <- filter_total_counts(counts, 0)
+  counts <- filter_protein_coding_genes(counts, genetype_lookup)
+  counts <- lpm_cpm_transform(counts)
+  counts <- filter_mean_counts(counts, threshold)
+  return(counts)
+}
+
+lpm_filter_protein_hemoglobin <- function(counts, genetype_lookup, hemoglobin_lookup) {
+  counts <- filter_total_counts(counts, 0)
+  counts <- filter_protein_coding_genes(counts, genetype_lookup)
+  counts <- filter_out_hemoglobin_genes(counts, hemoglobin_lookup)
+  counts <- lpm_cpm_transform(counts)
+  return(counts)
+}
+
+lpm_filter_protein_hemoglobin_mean_counts <- function(counts, genetype_lookup, hemoglobin_lookup, threshold) {
+  counts <- filter_protein_hemoglobin(counts, genetype_lookup, hemoglobin_lookup)
+  counts <- lpm_cpm_transform(counts)
+  counts <- filter_mean_counts(counts, threshold)
+  return(counts)
+}
