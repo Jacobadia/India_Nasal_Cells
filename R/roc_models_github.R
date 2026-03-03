@@ -19,12 +19,27 @@ library(kernlab)
 library(pls)
 library(readr)
 
+theme_SL2 <- function () {
+  theme_bw() %+replace%
+    theme(panel.grid = element_blank(),
+          panel.background = element_blank(),
+          panel.border = element_rect(colour = "black", fill=NA, size=1),
+          plot.background = element_blank(),
+          legend.background = element_rect(fill="transparent", colour=NA),
+          legend.key = element_rect(fill="transparent", colour=NA),
+          legend.text=element_text(size=12, family="Arial", face="bold"),
+          legend.title=element_blank())
+}
+
 ### extract gene_type_lookup.txt ###
-gene_types = read_tsv("R/genetype_lookup.txt")
+gene_types = read_tsv(
+  "R/genetype_lookup.txt",
+  col_names = c("Geneid", "name", "type")
+)
 head(gene_types)
 
 ### Prepping gene_counts data ###
-gene_counts_raw = read_tsv("R/gene_counts.tsv")
+gene_counts_raw = read_tsv("R/gene_counts_corrected.tsv")
 head(gene_counts_raw)
 
 metadata = read_tsv("R/metadata.tsv") 
@@ -136,30 +151,70 @@ prepare_nasal_data <- function(counts_path, coldata_path) {
 }
 
 
-# prep_nasal_data = prepare_nasal_data(gene_counts_raw, NULL)
 
-counts_data = prep_nasal_data$counts_raw
-counts_corrected = prep_nasal_data$counts_corrected
-col_data = prep_nasal_data$col_data
+### Prepare counts matrix
 
-# Convert to matrix
+# Collapse duplicate gene names
+gene_counts <- gene_counts %>%
+  group_by(name) %>%
+  summarise(across(where(is.numeric), sum), .groups = "drop")
 
-counts_data <- as.matrix(counts_data)
-all(rownames(coldata) %in% colnames(counts_data))
-all(rownames(coldata) == colnames(counts_data))
-all(colnames(counts_data) %in% rownames(coldata))
-all(colnames(counts_data) == rownames(coldata))
+gene_counts
+
+# Convert to matrix with genes as rows
+counts_data <- gene_counts %>%
+  column_to_rownames("name") %>%
+  as.matrix()
+
+counts_data
+
+### Prepare metadata
+
+col_data <- metadata %>%
+  select(sample, Age, Sex) %>%
+  mutate(status = str_sub(sample, -1) == "A") %>%
+  as.data.frame()
+
+col_data
+
+# rownames must match count matrix columns
+rownames(col_data) <- col_data$sample
+
+### Check alignment
+
+# ensure metadata matches counts
+all(colnames(counts_data) %in% rownames(col_data))
+
+# reorder metadata if needed
+col_data <- col_data[colnames(counts_data), ]
+
+# confirm perfect match
+all(colnames(counts_data) == rownames(col_data))
+
+### Batch correction using ComBat_seq
 
 
+batch <- factor(col_data$Sex)
+sample_group <- factor(col_data$status)
 
+counts_corrected <- ComBat_seq(
+  counts = counts_data,
+  batch = batch,
+  group = sample_group
+)
 
+counts_corrected
 
+counts_corrected_df <- as.data.frame(t(counts_corrected))
+model_data <- counts_corrected_df %>%
+  rownames_to_column("sample") %>%
+  left_join(col_data, by = "sample") %>%
+  select(all_of(feats), Age, Sex, status)
 
-batch <- factor(coldata$sex)
-sample_group <- factor(coldata$status)
-counts_corrected <- ComBat_seq(as.matrix(counts_data),
-    batch=batch,
-    group=sample_group)
+model_data$status <- factor(
+  ifelse(model_data$status, "case", "control"),
+  levels = c("control","case")
+)
 
 # DESeqq2, matrix -> DESeqq object for machine learing
 
@@ -192,7 +247,7 @@ fit_control <- trainControl(method="repeatedcv",
 #### RANGER ####
 set.seed(42)
 r_fit <- caret::train(status~.,
-                      data = nis_train_counts,
+                      data = model_data,
                       method = 'ranger',
                       metric = 'ROC',
                       tuneLength = 15,
@@ -388,3 +443,4 @@ overlapping_genes_ml
     # modling data frame function jacob
     # find overlap function ethan
     #variable importance function jacob
+#variable importance function jacob
