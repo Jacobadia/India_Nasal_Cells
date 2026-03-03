@@ -29,3 +29,10 @@ filter_mean_counts <- function(counts, threshold) {
   counts <- counts[average_counts >= threshold, ]
   return(counts)
 }
+
+filter_protein_mean_counts <- function(counts, genetype_lookup, threshold) {
+  counts <- filter_total_counts(counts, 0)
+  counts <- filter_protein_coding_genes(counts, genetype_lookup)
+  counts <- filter_mean_counts(counts, threshold)
+  return (counts)
+}
