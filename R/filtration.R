@@ -72,6 +72,7 @@ lpm_cpm_transform <- function(counts) {
 
 # Complementary functions that apply log per million transform before filtering
 lpm_filter_pure <- function(counts) {
+  counts <- filter_total_counts(counts, 0)
   counts <- lpm_cpm_transform(counts)
   return(counts)
 }
@@ -86,8 +87,8 @@ lpm_filter_protein_coding <- function(counts, genetype_lookup) {
 lpm_filter_protein_mean_counts <- function(counts, genetype_lookup, threshold) {
   counts <- filter_total_counts(counts, 0)
   counts <- filter_protein_coding_genes(counts, genetype_lookup)
-  counts <- lpm_cpm_transform(counts)
   counts <- filter_mean_counts(counts, threshold)
+  counts <- lpm_cpm_transform(counts)
   return(counts)
 }
 
@@ -101,7 +102,7 @@ lpm_filter_protein_hemoglobin <- function(counts, genetype_lookup, hemoglobin_lo
 
 lpm_filter_protein_hemoglobin_mean_counts <- function(counts, genetype_lookup, hemoglobin_lookup, threshold) {
   counts <- filter_protein_hemoglobin(counts, genetype_lookup, hemoglobin_lookup)
-  counts <- lpm_cpm_transform(counts)
   counts <- filter_mean_counts(counts, threshold)
+  counts <- lpm_cpm_transform(counts)
   return(counts)
 }
