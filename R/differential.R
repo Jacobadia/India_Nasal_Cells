@@ -59,7 +59,7 @@ full_deg_results_file, significant_deg_results_file) {
   design <- model.matrix(design_formula, data = conditionData)
 
   fit <- lmFit(as.matrix(counts), design)
-  fit <- eBayes(fit)
+  fit <- eBayes(fit, trend = TRUE, robust = TRUE)
 
   coef_name <- grep("conditionactive", colnames(design), value = TRUE)
   res <- topTable(fit, coef = coef_name, number = Inf, sort.by = "P")
