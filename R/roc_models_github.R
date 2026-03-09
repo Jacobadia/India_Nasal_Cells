@@ -1,11 +1,9 @@
-# ROC and models
+# ---- 1. Libraries ------------------------------------------------------------
 
-####   Libraries   ####
 library(tidyverse)
 library(DESeq2)
 library(caret)
 library(ggplot2)
-
 library(doParallel)
 library(devEMF)
 library(MLeval)
@@ -14,433 +12,297 @@ library(patchwork)
 library(cowplot)
 library(ranger)
 library(glmnet)
-
 library(kernlab)
 library(pls)
 library(readr)
 
-theme_SL2 <- function () {
+
+# ---- 2. Theme ----------------------------------------------------------------
+
+theme_SL2 <- function() {
   theme_bw() %+replace%
-    theme(panel.grid = element_blank(),
-          panel.background = element_blank(),
-          panel.border = element_rect(colour = "black", fill=NA, size=1),
-          plot.background = element_blank(),
-          legend.background = element_rect(fill="transparent", colour=NA),
-          legend.key = element_rect(fill="transparent", colour=NA),
-          legend.text=element_text(size=12, family="Arial", face="bold"),
-          legend.title=element_blank())
+    theme(
+      panel.grid        = element_blank(),
+      panel.background  = element_blank(),
+      panel.border      = element_rect(colour = "black", fill = NA, size = 1),
+      plot.background   = element_blank(),
+      legend.background = element_rect(fill = "transparent", colour = NA),
+      legend.key        = element_rect(fill = "transparent", colour = NA),
+      legend.text       = element_text(size = 12, family = "Arial", face = "bold"),
+      legend.title      = element_blank()
+    )
 }
 
-### extract gene_type_lookup.txt ###
-gene_types = read_tsv(
+
+# ---- 3. Load Data ------------------------------------------------------------
+
+gene_types <- read_tsv(
   "R/genetype_lookup.txt",
-  col_names = c("Geneid", "name", "type")
+  col_names = c("Geneid", "name", "type"),
+  show_col_types = FALSE
 )
-head(gene_types)
 
-### Prepping gene_counts data ###
-gene_counts_raw = read_tsv("R/gene_counts_corrected.tsv")
-head(gene_counts_raw)
+gene_counts_raw <- read_tsv(
+  "R/gene_counts_corrected.tsv",
+  show_col_types = FALSE
+)
 
-metadata = read_tsv("R/metadata.tsv") 
-head(metadata)
+metadata <- read_tsv(
+  "R/metadata.tsv",
+  show_col_types = FALSE
+) %>%
+  mutate(sample = `Nasal ID`)
 
-
-print(metadata, n=80)
-metadata = metadata %>% mutate(sample = `Nasal ID`)
-
-
-
-
-# joining the two tibbles
-gene_counts = left_join(gene_counts_raw, gene_types)
+# NOTE: One sample ID was corrected in the source data:
+#   Original: 565-00103  →  Corrected: 656-00103
 
 
+# ---- 4. Format Gene Counts ---------------------------------------------------
+
+# Join gene type annotations
+gene_counts <- left_join(gene_counts_raw, gene_types, by = "Geneid")
+
+# Standardise sample column names (dots → dashes, strip extra info)
 gene_counts <- gene_counts %>%
-  rename_with(~ str_extract(.x, "\\d{4}\\.\\d{5}\\.[A-Z]{2}"), 
-              matches("\\d{4}\\.\\d{5}\\.[A-Z]{2}"))
-
-gene_counts <- gene_counts %>%
+  rename_with(
+    ~ str_extract(.x, "\\d{4}\\.\\d{5}\\.[A-Z]{2}"),
+    matches("\\d{4}\\.\\d{5}\\.[A-Z]{2}")
+  ) %>%
   rename_with(~ gsub("\\.", "-", .x), -name)
 
-gene_counts = gene_counts %>%
+# Remove rows where gene name is still an Ensembl ID; drop genomic coordinate cols
+gene_counts <- gene_counts %>%
   filter(!startsWith(name, "ENSG")) %>%
-  select(-c(Geneid,Chr,Start,End,Strand,Length)) %>%
+  select(-c(Geneid, Chr, Start, End, Strand, Length)) %>%
   select(name, everything())
 
-gene_counts
-
-print(gene_counts, n=80)
-
-nis_signatures = c("SPIB", "SHISA2", "TESPA1", "CD1B") 
-
-nis_gene_counts = gene_counts %>%
-  filter(name %in% nis_signatures) %>%
-  select(-type)
-
-nis_gene_counts
-
-
-nis_gene_counts <- nis_gene_counts %>%
-  pivot_longer(
-    cols = -name,
-    names_to = "sample",
-    values_to = "count"
-  ) %>%
-  pivot_wider(
-    names_from = name,
-    values_from = count
-  )
-
-print(nis_gene_counts, n=80)
-
-nis_gene_counts = left_join(nis_gene_counts, metadata) %>% select(-`Nasal ID`)
-
-nis_gene_counts = mutate(nis_gene_counts, status = (str_sub(sample, -1) == "A"))
-
-nis_train_counts = select(nis_gene_counts, -sample)
-nis_train_counts = nis_train_counts %>% 
-  mutate(Sex = factor(Sex)) %>%
-  mutate(status = factor(status))
-
-nis_train_counts
-
-
-# All ID's ending with LA are index cases i.e participants with pulmonary tuberculosis. 
-# All ID's ending with LB are Household contacts i.e participants that are IGRA positive. 
-# The ID number is common as they are  from the same family. 
-# Also, there is an error in one of the ID numbers. I have changed it. 
-# The ID was 565-00103 but the correct ID is 656-00103.
-
-
-
-print(nis_train_counts, n=80)
-
-
-## theme ###
-
-### modling data frame ###
-
-prepare_nasal_data <- function(counts_path, coldata_path) {
-
-  counts_data <- read.csv(counts_path, header = TRUE, row.names = 1)
-  coldata <- read.csv(coldata_path, header = TRUE, row.names = 1)
-
-  coldata <- coldata %>%
-    dplyr::mutate(
-      status = factor(status, levels = c("control", "case")),
-      sex = factor(sex, levels = c("male", "female"))
-    )
-
-  counts_data <- as.matrix(counts_data)
-
-  batch <- factor(coldata$sex)
-  sample_group <- factor(coldata$status)
-
-  counts_corrected <- ComBat_seq(
-    counts_data,
-    batch = batch,
-    group = sample_group
-  )
-
-  return(list(
-    counts_raw = counts_data,
-    counts_corrected = counts_corrected,
-    coldata = coldata
-  ))
-}
-
-
-
-### Prepare counts matrix
-
-# Collapse duplicate gene names
+# Collapse duplicate gene names by summing counts
 gene_counts <- gene_counts %>%
   group_by(name) %>%
   summarise(across(where(is.numeric), sum), .groups = "drop")
 
-gene_counts
 
-# Convert to matrix with genes as rows
+# ---- 5. Prepare Matrix & Metadata for DESeq2 / ComBat_seq -------------------
+
+# Convert to genes-as-rows matrix
 counts_data <- gene_counts %>%
   column_to_rownames("name") %>%
   as.matrix()
 
-counts_data
-
-### Prepare metadata
-
+# Build colData for DESeq2 / ComBat
 col_data <- metadata %>%
   select(sample, Age, Sex) %>%
-  mutate(status = str_sub(sample, -1) == "A") %>%
+  mutate(status = str_sub(sample, -1) == "A") %>%   # LA = index/TB case
   as.data.frame()
 
-col_data
-
-# rownames must match count matrix columns
 rownames(col_data) <- col_data$sample
 
-### Check alignment
-
-# ensure metadata matches counts
-all(colnames(counts_data) %in% rownames(col_data))
-
-# reorder metadata if needed
+# Ensure column order in counts matches row order in col_data
 col_data <- col_data[colnames(counts_data), ]
 
-# confirm perfect match
-all(colnames(counts_data) == rownames(col_data))
-
-### Batch correction using ComBat_seq
+stopifnot(all(colnames(counts_data) == rownames(col_data)))
 
 
-batch <- factor(col_data$Sex)
-sample_group <- factor(col_data$status)
+# ---- 6. Batch Correction (ComBat_seq, correcting for Sex) --------------------
+
+batch         <- factor(col_data$Sex)
+sample_group  <- factor(col_data$status)
 
 counts_corrected <- ComBat_seq(
   counts = counts_data,
-  batch = batch,
-  group = sample_group
-)
-
-counts_corrected
-
-counts_corrected_df <- as.data.frame(t(counts_corrected))
-model_data <- counts_corrected_df %>%
-  rownames_to_column("sample") %>%
-  left_join(col_data, by = "sample") %>%
-  select(all_of(feats), Age, Sex, status)
-
-model_data$status <- factor(
-  ifelse(model_data$status, "case", "control"),
-  levels = c("control","case")
-)
-
-# DESeqq2, matrix -> DESeqq object for machine learing
-
-#Get and filter for significant genes
-# Placeholder for genes
-feats <- c(
-  "CST1", "CLC", "LGALS12", "ITLN1", "SPIB", "FETUB", "CEACAM21", "CD69",
-  "PTGDR2", "VSTM1", "CRISP2", "CLEC12A", "CEBPE", "CCR3", "SHISA2", "TPSAB1",
-  "TESPA1", "CISH", "CD1B", "ADAM19", "SIGLEC6", "PRSS33", "SLC9A3", "SORD",
-  "OTOF", "CLEC12B", "GAS1", "BTNL8", "FHL3", "POSTN", "IFIT2", "ZBTB16",
-  "FABP6", "RSAD2", "CCR7", "CASS4", "DYDC1", "GAPT", "IL31RA", "CNR2",
-  "CDH26", "HS3ST3A1", "COL28A1", "HRH4"
+  batch  = batch,
+  group  = sample_group
 )
 
 
-### machine learnig models ###
+# ---- 7. Define Feature Set ---------------------------------------------------
 
-### prepping cross fold validation ###
+# Genes identified as significant from DESeq2 analysis
+# feats <- c(
+# "CST1", "CLC", "LGALS12", "ITLN1", "SPIB", "FETUB", "CEACAM21", "CD69",
+# "PTGDR2", "VSTM1", "CRISP2", "CLEC12A", "CEBPE", "CCR3", "SHISA2", "TPSAB1",
+# "TESPA1", "CISH", "CD1B", "ADAM19", "SIGLEC6", "PRSS33", "SLC9A3", "SORD",
+# "OTOF", "CLEC12B", "GAS1", "BTNL8", "FHL3", "POSTN", "IFIT2", "ZBTB16",
+#"FABP6", "RSAD2", "CCR7", "CASS4", "DYDC1", "GAPT", "IL31RA", "CNR2",
+# "CDH26", "HS3ST3A1", "COL28A1", "HRH4" )
+
+# NIS 4-gene signature
+nis_signatures <- c("SPIB", "SHISA2", "TESPA1", "CD1B")
+
+
+# ---- 8. Build Model Data Frames ----------------------------------------------
+
+# Helper: transpose corrected counts, attach metadata, subset to feature set
+make_model_data <- function(feature_set) {
+  as.data.frame(t(counts_corrected)) %>%
+    rownames_to_column("sample") %>%
+    left_join(col_data, by = "sample") %>%
+    select(all_of(feature_set), Age, Sex, status) %>%
+    mutate(
+      Sex    = factor(Sex),
+      status = factor(
+        ifelse(status, "case", "control"),
+        levels = c("control", "case")
+      )
+    )
+}
+
+# model_data     <- make_model_data(feats)           # full gene set
+model_data_nis <- make_model_data(nis_signatures)  # NIS 4-gene set
+
+
+# ---- 9. Cross-Validation Control ---------------------------------------------
+
 set.seed(42)
-fit_control <- trainControl(method="repeatedcv",
-                            number=10,
-                            repeats=10, 
-                            summaryFunction=twoClassSummary,
-                            savePredictions = TRUE,
-                            classProbs = TRUE,
-                            verboseIter = TRUE,
-                            search = 'random')
+fit_control <- trainControl(
+  method          = "repeatedcv",
+  number          = 10,
+  repeats         = 10,
+  summaryFunction = twoClassSummary,
+  savePredictions = TRUE,
+  classProbs      = TRUE,
+  verboseIter     = TRUE,
+  search          = "random"
+)
 
 
-#### RANGER ####
-set.seed(42)
-r_fit <- caret::train(status~.,
-                      data = model_data,
-                      method = 'ranger',
-                      metric = 'ROC',
-                      tuneLength = 15,
-                      trControl = fit_control,
-                      importance = 'permutation')
+# ---- 10. ML Model Helper Functions -------------------------------------------
 
-fm_model_r <- evalm(r_fit, gnames='random forest', plots="r", fsize=11)
-ggr <- fm_model_r$roc + theme_SL2() + theme(legend.position = "bottom")
-dev.off()
-fm_model_r
+# Each function accepts a data frame and fit_control; returns the evalm object.
 
-
-#### ELASTIC NET ####
-
-elasticnet = function(feats, fit_control) {
+run_random_forest <- function(data, fit_control) {
   set.seed(42)
-  glmnet_fit <- train(
+  fit <- caret::train(
     status ~ .,
-    data = feats,
-    method = "glmnet",
-    metric = "ROC",
-    trControl = fit_control,
-    preProcess = c("center","scale")
+    data       = data,
+    method     = "ranger",
+    metric     = "ROC",
+    tuneLength = 15,
+    trControl  = fit_control,
+    importance = "permutation"
   )
-
-  fm_model_e <- evalm(glmnet_fit, gnames='elastic net', plots="r", fsize=11)
-  gge <- fm_model_e$roc + theme_SL2() + theme(legend.position = "bottom")
-  dev.off()
-  fm_model_e
+  fm  <- evalm(fit, gnames = "random forest", plots = "r", fsize = 11)
+  fm$roc + theme_SL2() + theme(legend.position = "bottom")
+  fit  # return the fit for importance extraction
 }
 
-elasticnet(feats, fit_control)
-
-
-#### SVM radial ####
-
-svmradial = function(feats, fit_control) {
+run_elasticnet <- function(data, fit_control) {
   set.seed(42)
-  svmr_fit <- train(
+  fit <- train(
     status ~ .,
-    data = feats,
-    method = "svmRadial",
-    metric = "ROC",
-    trControl = fit_control,
-    tuneLength = 15,
-    preProcess = c("center","scale")
+    data       = data,
+    method     = "glmnet",
+    metric     = "ROC",
+    trControl  = fit_control,
+    preProcess = c("center", "scale")
   )
-  
-  fm_model_svmr <- evalm(svmr_fit, gnames='SVM (radial)', plots="r", fsize=11)
-  ggsvmr <- fm_model_svmr$roc + theme_SL2() + theme(legend.position = "bottom")
-  dev.off()
-  fm_model_svmr
+  fm  <- evalm(fit, gnames = "elastic net", plots = "r", fsize = 11)
+  fm$roc + theme_SL2() + theme(legend.position = "bottom")
+  fit
 }
 
-svmradial(feats, fit_control)
-
-#### SVM linear ####
-
-svmlinear = function(feats, fit_control) {
+run_svm_radial <- function(data, fit_control) {
   set.seed(42)
-  svm_fit <- train(
-    status ~ ., data = feats,
-    method = "svmLinear",
-    metric = "ROC",
-    trControl = fit_control,
+  fit <- train(
+    status ~ .,
+    data       = data,
+    method     = "svmRadial",
+    metric     = "ROC",
+    trControl  = fit_control,
     tuneLength = 15,
-    preProcess = c("center","scale")
+    preProcess = c("center", "scale")
   )
-  
-  fm_model_svm <- evalm(svm_fit, gnames='SVM (linear)', plots="r", fsize=11)
-  ggsvm <- fm_model_svm$roc + theme_SL2() + theme(legend.position = "bottom")
-  dev.off()
-  fm_model_svm
-  
+  fm  <- evalm(fit, gnames = "SVM (radial)", plots = "r", fsize = 11)
+  fm$roc + theme_SL2() + theme(legend.position = "bottom")
+  fit
 }
 
-svmlinear(feats, fit_control)
-
-#### KNN ####
-
-knn = function(feats, fit_control) {
-  
-set.seed(42)
-knn_fit <- train(
-  status ~ ., data = feats,
-  method = "knn",
-  metric = "ROC",
-  trControl = fit_control,
-  tuneLength = 15,
-  preProcess = c("center","scale"))
-
-
-fm_model_knn <- evalm(knn_fit, gnames='kNN', plots="r", fsize=11)
-ggk <- fm_model_knn$roc + theme_SL2() + theme(legend.position = "bottom")
-dev.off()
-fm_model_knn
-}
-
-knn(feats, fit_control)
-
-#### PLS####
-
-pls = function(feats, fit_control) {
+run_svm_linear <- function(data, fit_control) {
   set.seed(42)
-  pls_fit <- train(
-    status ~ ., data = feats,
-    method   = "pls",
-    metric   = "ROC",
-    trControl = fit_control,
-    preProcess = c("center","scale"))
-  
-  
-  fm_model_pls <- evalm(pls_fit, gnames='PLS', plots="r", fsize=11)
-  ggp <- fm_model_pls$roc + theme_SL2() + theme(legend.position = "bottom")
-  dev.off()
-  fm_model_pls
+  fit <- train(
+    status ~ .,
+    data       = data,
+    method     = "svmLinear",
+    metric     = "ROC",
+    trControl  = fit_control,
+    tuneLength = 15,
+    preProcess = c("center", "scale")
+  )
+  fm  <- evalm(fit, gnames = "SVM (linear)", plots = "r", fsize = 11)
+  fm$roc + theme_SL2() + theme(legend.position = "bottom")
+  fit
 }
 
-pls(feats, fit_control)
+run_knn <- function(data, fit_control) {
+  set.seed(42)
+  fit <- train(
+    status ~ .,
+    data       = data,
+    method     = "knn",
+    metric     = "ROC",
+    trControl  = fit_control,
+    tuneLength = 15,
+    preProcess = c("center", "scale")
+  )
+  fm  <- evalm(fit, gnames = "kNN", plots = "r", fsize = 11)
+  fm$roc + theme_SL2() + theme(legend.position = "bottom")
+  fit
+}
+
+run_pls <- function(data, fit_control) {
+  set.seed(42)
+  fit <- train(
+    status ~ .,
+    data       = data,
+    method     = "pls",
+    metric     = "ROC",
+    trControl  = fit_control,
+    preProcess = c("center", "scale")
+  )
+  fm  <- evalm(fit, gnames = "PLS", plots = "r", fsize = 11)
+  fm$roc + theme_SL2() + theme(legend.position = "bottom")
+  fit
+}
 
 
-### Variable importance
+# ---- 11. Run Models — Full Feature Set ---------------------------------------
 
-plot_importance <- function(fit, model_name, top = 10) {
-  imp <- varImp(fit)
-  ggplot(imp, top = top) +
+# r_fit       <- run_random_forest(model_data, fit_control)
+# glmnet_fit  <- run_elasticnet(model_data, fit_control)
+# svmr_fit    <- run_svm_radial(model_data, fit_control)
+# svm_fit     <- run_svm_linear(model_data, fit_control)
+# knn_fit     <- run_knn(model_data, fit_control)
+# pls_fit     <- run_pls(model_data, fit_control)
+
+
+
+# ---- 13. Run Models — NIS 4-Gene Subset --------------------------------------
+
+r_fit_nis      <- run_random_forest(model_data_nis, fit_control)
+glmnet_fit_nis <- run_elasticnet(model_data_nis, fit_control)
+svmr_fit_nis   <- run_svm_radial(model_data_nis, fit_control)
+svm_fit_nis    <- run_svm_linear(model_data_nis, fit_control)
+knn_fit_nis    <- run_knn(model_data_nis, fit_control)
+pls_fit_nis    <- run_pls(model_data_nis, fit_control)
+
+
+#### Figures — Individual ROC plots per model ####
+
+make_roc_plot <- function(fit, model_name) {
+  evalm(fit, gnames = model_name, plots = "r", fsize = 11)$roc +
     theme_SL2() +
-    ggtitle(paste("Top", top, "Genes by Importance in", model_name)) +
-    xlab("Genes") +
-    ylab("Variable Importance") +
-    theme(axis.text.x = element_text(size = 16, angle = 45, hjust = 1))
+    theme(legend.position = "bottom") +
+    ggtitle(model_name) +
+    theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 }
 
-#Generate importance plots
+roc_rf      <- make_roc_plot(r_fit_nis,      "Random Forest")
+roc_enet    <- make_roc_plot(glmnet_fit_nis,  "Elastic Net")
+roc_svmr    <- make_roc_plot(svmr_fit_nis,    "SVM (radial)")
+roc_svml    <- make_roc_plot(svm_fit_nis,     "SVM (linear)")
+roc_knn     <- make_roc_plot(knn_fit_nis,     "kNN")
+roc_pls     <- make_roc_plot(pls_fit_nis,     "PLS")
 
-#Find overlaps
-#overlaps
-importance_knn <- varImp(knn_fit,)
-importance_svmr <- varImp(svmr_fit)
-importance_svml <- varImp(svm_fit)
-importance_pls <- varImp(pls_fit)
-importance_glm <- varImp(glmnet_fit)
-importance_rf <- varImp(r_fit)
-
-
-importance_rf_df <- as.data.frame(importance_rf$importance)
-sorted_importance_rf_df <- importance_rf_df[order(importance_rf_df$Overall,
-    decreasing = TRUE), , drop = FALSE]
-
-
-importance_knn_df <- as.data.frame(importance_knn$importance)
-sorted_importance_knn_df <- importance_knn_df[order(importance_knn_df$control,
-    decreasing = TRUE), , drop = FALSE]
-
-
-importance_pls_df <- as.data.frame(importance_pls$importance)
-sorted_importance_pls_df <- importance_pls_df[order(importance_pls_df$Overall,
-    decreasing = TRUE), , drop = FALSE]
-
-
-importance_glm_df <- as.data.frame(importance_glm$importance)
-sorted_importance_glm_df <- importance_glm_df[order(importance_glm_df$Overall,
-    decreasing = TRUE), , drop = FALSE]
-
-
-# which overlap between machine learning methods ####
-# top 10 important
-top_predictive_genes_knn <- rownames(sorted_importance_knn_df)[1:10]
-top_predictive_genes_rf <- rownames(sorted_importance_rf_df)[1:10]
-top_predictive_genes_pls <- rownames(sorted_importance_pls_df)[1:10]
-top_predictive_genes_glm <- rownames(sorted_importance_glm_df)[1:10]
-
-overlapping_genes_ml <- Reduce(intersect, list(
-  top_predictive_genes_knn,
-  top_predictive_genes_rf,
-  top_predictive_genes_pls,
-  top_predictive_genes_glm
-))
-overlapping_genes_ml
-
-### refit on overlapping genes ###
-
-### machine learnig models ###
-
-#### Figures  ####
-
-
-
-##notes
-    # LA = Diseased pulmonary (case), LB = infection (control)
-    # Three pipelines 1. 80 all 2. 80 feature 65 train, 14 test 3. 14 feature, 50 train, 15 test
-    # function for each model ethan
-    # modling data frame function jacob
-    # find overlap function ethan
-    #variable importance function jacob
-#variable importance function jacob
+# Assemble into a 2x3 grid
+(roc_rf | roc_enet | roc_svmr) /
+  (roc_svml | roc_knn | roc_pls)
