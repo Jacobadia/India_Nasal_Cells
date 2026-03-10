@@ -1,10 +1,11 @@
 library(ggplot2)
 
-create_pvalue_histogram <- function(plot_dir, deg_results_file) {
+create_pvalue_histogram <- function(plot_dir, deg_results_file, artifacts_dir = "../artifacts/") {
 
+  print(paste("Creating p-value histogram for:", deg_results_file))
   # Load the full DEG results
   full_deg_results_file <- deg_results_file
-  output_histogram_file <- paste0("../artifacts/", plot_dir, "/pvalue_histogram.png")
+  output_histogram_file <- paste0(artifacts_dir, plot_dir, "/pvalue_histogram.png")
 
   deg_results <- read.delim(full_deg_results_file, header = TRUE, stringsAsFactors = FALSE)
 

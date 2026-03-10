@@ -11,6 +11,27 @@ get_counts_data <- function(matrix_counts_file) {
   return (counts)
 }
 
+get_counts_data_cvim <- function(matrix_counts_file) {
+  print(paste("Loading counts data from:", matrix_counts_file))
+  counts <- read.delim(
+    matrix_counts_file,
+    row.names = 1,
+    comment.char = "#",
+    check.names = FALSE
+  )
+
+  return (counts)
+}
+
+get_condition_data_cvim <- function(counts, metadata_file) {
+  print(paste("Loading metadata from:", metadata_file))
+  metadata <- read.delim(metadata_file, header = TRUE, stringsAsFactors = FALSE)
+  metadata$Condition <- factor(metadata$Condition, levels = c("Deficient", "Control"))
+  conditionData = data.frame(condition = metadata$Condition)
+  rownames(conditionData) <- metadata$Sample_name
+  return(conditionData)
+}
+
 get_condition_data <- function(counts, metadata_file) {
   print(paste("Loading metadata from:", metadata_file))
   sample_names <- colnames(counts)
