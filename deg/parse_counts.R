@@ -38,6 +38,10 @@ get_condition_data <- function(counts, metadata_file) {
 
   condition <- ifelse(grepl("LB", sample_names), "latent",
                       ifelse(grepl("LA", sample_names), "active", NA))
+
+  # Here I'm defining the order of the levels
+  # This means that latent is the reference, and active is the condition
+  # Log2 fold changes will be  active / latent
   condition <- factor(condition, levels = c("latent", "active"))
 
   # Load the tsv of Sex and Age data
