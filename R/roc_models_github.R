@@ -1,5 +1,3 @@
-# ---- 1. Libraries ------------------------------------------------------------
-
 library(tidyverse)
 library(DESeq2)
 library(caret)
@@ -17,7 +15,7 @@ library(pls)
 library(readr)
 
 
-# ---- 2. Theme ----------------------------------------------------------------
+### Theme
 
 theme_SL2 <- function() {
   theme_bw() %+replace%
@@ -34,8 +32,7 @@ theme_SL2 <- function() {
 }
 
 
-# ---- 3. Load Data ------------------------------------------------------------
-
+### Load Data
 gene_types <- read_tsv(
   "R/genetype_lookup.txt",
   col_names = c("Geneid", "name", "type"),
@@ -57,7 +54,7 @@ metadata <- read_tsv(
 #   Original: 565-00103  →  Corrected: 656-00103
 
 
-# ---- 4. Format Gene Counts ---------------------------------------------------
+### Format Gene Counts
 
 # Join gene type annotations
 gene_counts <- left_join(gene_counts_raw, gene_types, by = "Geneid")
@@ -82,7 +79,7 @@ gene_counts <- gene_counts %>%
   summarise(across(where(is.numeric), sum), .groups = "drop")
 
 
-# ---- 5. Prepare Matrix & Metadata for DESeq2 / ComBat_seq -------------------
+### Prepare Matrix & Metadata for DESeq2 / ComBat_seq 
 
 # Convert to genes-as-rows matrix
 counts_data <- gene_counts %>%
@@ -103,7 +100,7 @@ col_data <- col_data[colnames(counts_data), ]
 stopifnot(all(colnames(counts_data) == rownames(col_data)))
 
 
-# ---- 6. Batch Correction (ComBat_seq, correcting for Sex) --------------------
+### Batch Correction (ComBat_seq, correcting for Sex)
 
 batch         <- factor(col_data$Sex)
 sample_group  <- factor(col_data$status)
@@ -115,31 +112,32 @@ counts_corrected <- ComBat_seq(
 )
 
 
-# ---- 7. Define Feature Set ---------------------------------------------------
+### Define Feature Set
 
 # Genes identified as significant from DESeq2 analysis
-# feats <- c(
-# "CST1", "CLC", "LGALS12", "ITLN1", "SPIB", "FETUB", "CEACAM21", "CD69",
-# "PTGDR2", "VSTM1", "CRISP2", "CLEC12A", "CEBPE", "CCR3", "SHISA2", "TPSAB1",
-# "TESPA1", "CISH", "CD1B", "ADAM19", "SIGLEC6", "PRSS33", "SLC9A3", "SORD",
-# "OTOF", "CLEC12B", "GAS1", "BTNL8", "FHL3", "POSTN", "IFIT2", "ZBTB16",
-#"FABP6", "RSAD2", "CCR7", "CASS4", "DYDC1", "GAPT", "IL31RA", "CNR2",
-# "CDH26", "HS3ST3A1", "COL28A1", "HRH4" )
+signatures <- c("RNU6-289P","RN7SKP270","FAM90A11","RNU6ATAC36P","HAVCR1P1", "ENSG00000278215")
 
 # NIS 4-gene signature
-nis_signatures <- c("SPIB", "SHISA2", "TESPA1", "CD1B")
+# signatures <- c("SPIB", "SHISA2", "TESPA1", "CD1B")
+
+#profiler genes
+#signatures <- c("FCGR1A", "GBP5", "GBP6", "C1QB", "FCGR1B", "SEPT4", "ANDKRD22")
+
+valid_genes <- intersect(
+  signatures,
+  colnames(as.data.frame(t(counts_corrected)))
+)
 
 
-# ---- 8. Build Model Data Frames ----------------------------------------------
+### Build Model Data Frames 
 
 # Helper: transpose corrected counts, attach metadata, subset to feature set
 make_model_data <- function(feature_set) {
   as.data.frame(t(counts_corrected)) %>%
     rownames_to_column("sample") %>%
     left_join(col_data, by = "sample") %>%
-    select(all_of(feature_set), Age, Sex, status) %>%
+    select(all_of(feature_set), status) %>%
     mutate(
-      Sex    = factor(Sex),
       status = factor(
         ifelse(status, "case", "control"),
         levels = c("control", "case")
@@ -147,11 +145,10 @@ make_model_data <- function(feature_set) {
     )
 }
 
-# model_data     <- make_model_data(feats)           # full gene set
-model_data_nis <- make_model_data(nis_signatures)  # NIS 4-gene set
+model_data <- make_model_data(valid_genes)
 
 
-# ---- 9. Cross-Validation Control ---------------------------------------------
+### Cross-Validation Control
 
 set.seed(42)
 fit_control <- trainControl(
@@ -166,8 +163,7 @@ fit_control <- trainControl(
 )
 
 
-# ---- 10. ML Model Helper Functions -------------------------------------------
-
+### ML Model Helper Functions 
 # Each function accepts a data frame and fit_control; returns the evalm object.
 
 run_random_forest <- function(data, fit_control) {
@@ -265,28 +261,17 @@ run_pls <- function(data, fit_control) {
 }
 
 
-# ---- 11. Run Models — Full Feature Set ---------------------------------------
+### Run Models
 
-# r_fit       <- run_random_forest(model_data, fit_control)
-# glmnet_fit  <- run_elasticnet(model_data, fit_control)
-# svmr_fit    <- run_svm_radial(model_data, fit_control)
-# svm_fit     <- run_svm_linear(model_data, fit_control)
-# knn_fit     <- run_knn(model_data, fit_control)
-# pls_fit     <- run_pls(model_data, fit_control)
-
-
-
-# ---- 13. Run Models — NIS 4-Gene Subset --------------------------------------
-
-r_fit_nis      <- run_random_forest(model_data_nis, fit_control)
-glmnet_fit_nis <- run_elasticnet(model_data_nis, fit_control)
-svmr_fit_nis   <- run_svm_radial(model_data_nis, fit_control)
-svm_fit_nis    <- run_svm_linear(model_data_nis, fit_control)
-knn_fit_nis    <- run_knn(model_data_nis, fit_control)
-pls_fit_nis    <- run_pls(model_data_nis, fit_control)
+r_fit       <- run_random_forest(model_data, fit_control)
+glmnet_fit  <- run_elasticnet(model_data, fit_control)
+svmr_fit    <- run_svm_radial(model_data, fit_control)
+svm_fit     <- run_svm_linear(model_data, fit_control)
+knn_fit     <- run_knn(model_data, fit_control)
+pls_fit     <- run_pls(model_data, fit_control)
 
 
-#### Figures — Individual ROC plots per model ####
+### Figures
 
 make_roc_plot <- function(fit, model_name) {
   evalm(fit, gnames = model_name, plots = "r", fsize = 11)$roc +
@@ -306,3 +291,7 @@ roc_pls     <- make_roc_plot(pls_fit_nis,     "PLS")
 # Assemble into a 2x3 grid
 (roc_rf | roc_enet | roc_svmr) /
   (roc_svml | roc_knn | roc_pls)
+
+
+
+
