@@ -69,7 +69,7 @@ gene_counts <- gene_counts %>%
 
 # Remove rows where gene name is still an Ensembl ID; drop genomic coordinate cols
 gene_counts <- gene_counts %>%
-  filter(!startsWith(name, "ENSG")) %>%
+  # filter(!startsWith(name, "ENSG")) %>%
   select(-c(Geneid, Chr, Start, End, Strand, Length)) %>%
   select(name, everything())
 
@@ -111,11 +111,15 @@ counts_corrected <- ComBat_seq(
   group  = sample_group
 )
 
-
 ### Define Feature Set
 
 # Genes identified as significant from DESeq2 analysis
-signatures <- c("RNU6-289P","RN7SKP270","FAM90A11","RNU6ATAC36P","HAVCR1P1", "ENSG00000278215")
+# signatures <- c("RNU6-289P","RN7SKP270","FAM90A11","RNU6ATAC36P","HAVCR1P1", "ENSG00000278215")
+
+#genes identified by Lima
+signatures <- gene_types %>%
+  filter(str_remove(Geneid, "\\..*") %in% c("ENSG00000156738", "ENSG00000167157")) %>%
+  pull(name)
 
 # NIS 4-gene signature
 # signatures <- c("SPIB", "SHISA2", "TESPA1", "CD1B")
@@ -281,17 +285,16 @@ make_roc_plot <- function(fit, model_name) {
     theme(plot.title = element_text(hjust = 0.5, face = "bold", size = 12))
 }
 
-roc_rf      <- make_roc_plot(r_fit_nis,      "Random Forest")
-roc_enet    <- make_roc_plot(glmnet_fit_nis,  "Elastic Net")
-roc_svmr    <- make_roc_plot(svmr_fit_nis,    "SVM (radial)")
-roc_svml    <- make_roc_plot(svm_fit_nis,     "SVM (linear)")
-roc_knn     <- make_roc_plot(knn_fit_nis,     "kNN")
-roc_pls     <- make_roc_plot(pls_fit_nis,     "PLS")
+roc_rf      <- make_roc_plot(r_fit,      "Random Forest")
+roc_enet    <- make_roc_plot(glmnet_fit,  "Elastic Net")
+roc_svmr    <- make_roc_plot(svmr_fit,    "SVM (radial)")
+roc_svml    <- make_roc_plot(svm_fit,     "SVM (linear)")
+roc_knn     <- make_roc_plot(knn_fit,     "kNN")
+roc_pls     <- make_roc_plot(pls_fit,     "PLS")
 
 # Assemble into a 2x3 grid
-(roc_rf | roc_enet | roc_svmr) /
+
+roc_grid <- (roc_rf | roc_enet | roc_svmr) /
   (roc_svml | roc_knn | roc_pls)
 
-
-
-
+roc_grid
