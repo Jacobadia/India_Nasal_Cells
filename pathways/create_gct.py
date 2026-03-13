@@ -9,11 +9,12 @@ from __future__ import annotations
 import argparse
 import csv
 from pathlib import Path
+from name_mapper import GeneNameMapper
 
 
 DEFAULT_INPUT = Path("../artifacts/gene_counts_corrected.tsv")
 DEFAULT_OUTPUT = Path("../pathway_artifacts/gene_counts_corrected.gct")
-
+MAPPER = GeneNameMapper()
 
 def parse_args() -> argparse.Namespace:
 	parser = argparse.ArgumentParser(
@@ -64,6 +65,7 @@ def convert_tsv_to_gct(input_path: Path, output_path: Path) -> None:
 			# Keep only Name (gene id) and expression columns.
 			name = row[0] if len(row) > 0 else ""
 			expression_values = row[6:] if len(row) > 6 else []
+			name = MAPPER.map_gene_id(name)
 
 			if len(expression_values) < len(sample_names):
 				expression_values.extend([""] * (len(sample_names) - len(expression_values)))
