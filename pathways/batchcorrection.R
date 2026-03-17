@@ -73,4 +73,4 @@ batch_corrected_df <- as.data.frame(batch_corrected) %>%
   rownames_to_column("Geneid")
 
 # Save batch corrected counts
-write_tsv(batch_corrected_df, "pathways/counts_sex_corrected.tsv")
+write_tsv(batch_corrected_df, "pathway_artifacts/counts_sex_corrected.tsv")
