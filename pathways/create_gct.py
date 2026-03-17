@@ -1,7 +1,7 @@
 """Convert corrected gene counts TSV into a GSEA-ready GCT file.
 
-This script reads the count matrix in ../artifacts/gene_counts_corrected.tsv and
-writes a GCT v1.2 file to ../pathway_artifacts without modifying the input file.
+This script reads the count matrix in ../pathway_artifacts/counts_sex_corrected.tsv
+and writes a GCT v1.2 file to ../pathway_artifacts without modifying the input file.
 """
 
 from __future__ import annotations
@@ -12,8 +12,8 @@ from pathlib import Path
 from name_mapper import GeneNameMapper
 
 
-DEFAULT_INPUT = Path("../artifacts/gene_counts_corrected.tsv")
-DEFAULT_OUTPUT = Path("../pathway_artifacts/gene_counts_corrected.gct")
+DEFAULT_INPUT = Path("../pathway_artifacts/counts_sex_corrected.tsv")
+DEFAULT_OUTPUT = Path("../pathway_artifacts/counts_sex_corrected.gct")
 MAPPER = GeneNameMapper()
 
 def parse_args() -> argparse.Namespace:
@@ -24,13 +24,13 @@ def parse_args() -> argparse.Namespace:
 		"--input",
 		type=Path,
 		default=DEFAULT_INPUT,
-		help="Input TSV file (default: ../artifacts/gene_counts_corrected.tsv)",
+		help="Input TSV file (default: ../pathway_artifacts/counts_sex_corrected.tsv)",
 	)
 	parser.add_argument(
 		"--output",
 		type=Path,
 		default=DEFAULT_OUTPUT,
-		help="Output GCT file (default: ../pathway_artifacts/gene_counts_corrected.gct)",
+		help="Output GCT file (default: ../pathway_artifacts/counts_sex_corrected.gct)",
 	)
 	return parser.parse_args()
 
@@ -47,15 +47,15 @@ def convert_tsv_to_gct(input_path: Path, output_path: Path) -> None:
 		if not header:
 			raise ValueError(f"Input file is empty: {input_path}")
 
-		if len(header) < 7:
+		if len(header) < 2:
 			raise ValueError(
 				"Input does not have expected columns. "
-				"Need at least metadata + one sample column."
+				"Need at least Geneid + one sample column."
 			)
 
-		# The source matrix begins with: Geneid, Chr, Start, End, Strand, Length,
-		# then one column per sample. GCT needs Name, Description, then sample values.
-		sample_names = header[6:]
+		# The source matrix begins with Geneid, then one column per sample.
+		# GCT needs Name, Description, then sample values.
+		sample_names = header[1:]
 		rows: list[list[str]] = []
 
 		for row in reader:
@@ -64,7 +64,7 @@ def convert_tsv_to_gct(input_path: Path, output_path: Path) -> None:
 
 			# Keep only Name (gene id) and expression columns.
 			name = row[0] if len(row) > 0 else ""
-			expression_values = row[6:] if len(row) > 6 else []
+			expression_values = row[1:] if len(row) > 1 else []
 			name = MAPPER.map_gene_id(name)
 
 			if len(expression_values) < len(sample_names):
