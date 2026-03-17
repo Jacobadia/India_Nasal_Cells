@@ -1,13 +1,10 @@
 from pathlib import Path
 import sys
 from typing import List
-try:
-    from pathways.name_mapper import GeneNameMapper
-except ModuleNotFoundError:
-    # Allow running this script directly from deg/.
-    repo_root = Path(__file__).resolve().parent.parent
-    sys.path.insert(0, str(repo_root))
-    from pathways.name_mapper import GeneNameMapper
+
+repo_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(repo_root))
+from pathways.name_mapper import GeneNameMapper
 
 input_file = "../artifacts/lpm_pure_no_control/deg_results_full.txt"
 
