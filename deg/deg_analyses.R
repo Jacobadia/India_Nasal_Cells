@@ -130,124 +130,124 @@ protein_hemoglobin_control_age_and_sex <- create_test_func(matrix_counts_file, m
 
 lpm_pure_no_control <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_pure_no_control", run_limma_control_nothing, function(counts, gene_type_file) {
-    return (lpm_filter_pure(counts))
+    return (counts)
 })
 
 lpm_pure_control_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_pure_control_sex", run_limma_control_sex, function(counts, gene_type_file) {
-    return (lpm_filter_pure(counts))
+    return (counts)
 })
 
 lpm_pure_control_age <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_pure_control_age", run_limma_control_age, function(counts, gene_type_file) {
-    return (lpm_filter_pure(counts))
+    return (counts)
 })
 
 lpm_pure_control_age_and_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_pure_control_age_and_sex", run_limma_control_sex_and_age, function(counts, gene_type_file) {
-    return (lpm_filter_pure(counts))
+    return (counts)
 })
 
 lpm_protein_control_nothing <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_control_nothing", run_limma_control_nothing, function(counts, gene_type_file) {
-    return (lpm_filter_protein_coding(counts, get_genetype_lookup(gene_type_file)))
+    return (filter_protein_coding_genes(counts, get_genetype_lookup(gene_type_file)))
 })
 
 lpm_protein_control_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_control_sex", run_limma_control_sex, function(counts, gene_type_file) {
-    return (lpm_filter_protein_coding(counts, get_genetype_lookup(gene_type_file)))
+    return (filter_protein_coding_genes(counts, get_genetype_lookup(gene_type_file)))
 })
 
 lpm_protein_control_age <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_control_age", run_limma_control_age, function(counts, gene_type_file) {
-    return (lpm_filter_protein_coding(counts, get_genetype_lookup(gene_type_file)))
+    return (filter_protein_coding_genes(counts, get_genetype_lookup(gene_type_file)))
 })
 
 lpm_protein_control_age_and_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_control_age_and_sex", run_limma_control_sex_and_age, function(counts, gene_type_file) {
-    return (lpm_filter_protein_coding(counts, get_genetype_lookup(gene_type_file)))
+    return (filter_protein_coding_genes(counts, get_genetype_lookup(gene_type_file)))
 })
 
 lpm_protein_hemoglobin_control_nothing <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_hemoglobin_control_nothing", run_limma_control_nothing, function(counts, gene_type_file) {
-    return (lpm_filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
+    return (filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
 })
 
 lpm_protein_hemoglobin_control_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_hemoglobin_control_sex", run_limma_control_sex, function(counts, gene_type_file) {
-    return (lpm_filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
+    return (filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
 })
 
 lpm_protein_hemoglobin_control_age <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_hemoglobin_control_age", run_limma_control_age, function(counts, gene_type_file) {
-    return (lpm_filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
+    return (filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
 })
 
 lpm_protein_hemoglobin_control_age_and_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_hemoglobin_control_age_and_sex", run_limma_control_sex_and_age, function(counts, gene_type_file) {
-    return (lpm_filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
+    return (filter_protein_hemoglobin(counts, get_genetype_lookup(gene_type_file), get_hemoglobin_lookup(hemoglobin_file)))
 })
 
 lpm_protein_mean_10_control_nothing <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_mean_10_control_nothing", run_limma_control_nothing, function(counts, gene_type_file) {
-    return (lpm_filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 10))
+    return (filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 10))
 })
 
 lpm_protein_mean_10_control_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_mean_10_control_sex", run_limma_control_sex, function(counts, gene_type_file) {
-    return (lpm_filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 10))
+    return (filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 10))
 })
 
 lpm_protein_mean_10_control_age <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_mean_10_control_age", run_limma_control_age, function(counts, gene_type_file) {
-    return (lpm_filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 10))
+    return (filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 10))
 })
 
 lpm_protein_mean_10_control_age_and_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_mean_10_control_age_and_sex", run_limma_control_sex_and_age, function(counts, gene_type_file) {
-    return (lpm_filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 10))
+    return (filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 10))
 })
 
 lpm_protein_mean_100_control_nothing <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_mean_100_control_nothing", run_limma_control_nothing, function(counts, gene_type_file) {
-    return (lpm_filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 100))
+    return (filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 100))
 })
 
 lpm_protein_mean_100_control_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_mean_100_control_sex", run_limma_control_sex, function(counts, gene_type_file) {
-    return (lpm_filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 100))
+    return (filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 100))
 })
 
 lpm_protein_mean_100_control_age <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_mean_100_control_age", run_limma_control_age, function(counts, gene_type_file) {
-    return (lpm_filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 100))
+    return (filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 100))
 })
 
 lpm_protein_mean_100_control_age_and_sex <- create_test_func(matrix_counts_file, metadata_file, gene_type_file,
 "lpm_protein_mean_100_control_age_and_sex", run_limma_control_sex_and_age, function(counts, gene_type_file) {
-    return (lpm_filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 100))
+    return (filter_protein_mean_counts(counts, get_genetype_lookup(gene_type_file), 100))
 })
 
-pure_no_control()
-pure_control_sex()
-pure_control_age()
-pure_control_age_and_sex()
-protein_control_nothing()
-protein_control_sex()
-protein_control_age()
-protein_control_age_and_sex()
-protein_hemoglobin_control_nothing()
-protein_hemoglobin_control_sex()
-protein_hemoglobin_control_age()
-protein_hemoglobin_control_age_and_sex()
-protein_mean_10_control_nothing()
-protein_mean_10_control_sex()
-protein_mean_10_control_age()
-protein_mean_10_control_age_and_sex()
-protein_mean_100_control_nothing()
-protein_mean_100_control_sex()
-protein_mean_100_control_age()
-protein_mean_100_control_age_and_sex()
+# pure_no_control()
+# pure_control_sex()
+# pure_control_age()
+# pure_control_age_and_sex()
+# protein_control_nothing()
+# protein_control_sex()
+# protein_control_age()
+# protein_control_age_and_sex()
+# protein_hemoglobin_control_nothing()
+# protein_hemoglobin_control_sex()
+# protein_hemoglobin_control_age()
+# protein_hemoglobin_control_age_and_sex()
+# protein_mean_10_control_nothing()
+# protein_mean_10_control_sex()
+# protein_mean_10_control_age()
+# protein_mean_10_control_age_and_sex()
+# protein_mean_100_control_nothing()
+# protein_mean_100_control_sex()
+# protein_mean_100_control_age()
+# protein_mean_100_control_age_and_sex()
 
 lpm_pure_no_control()
 lpm_pure_control_sex()
