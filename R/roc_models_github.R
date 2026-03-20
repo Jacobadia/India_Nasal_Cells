@@ -53,7 +53,6 @@ metadata <- read_tsv(
 # NOTE: One sample ID was corrected in the source data:
 #   Original: 565-00103  →  Corrected: 656-00103
 
-
 ### Format Gene Counts
 
 # Join gene type annotations
@@ -77,7 +76,6 @@ gene_counts <- gene_counts %>%
 gene_counts <- gene_counts %>%
   group_by(name) %>%
   summarise(across(where(is.numeric), sum), .groups = "drop")
-
 
 ### Prepare Matrix & Metadata for DESeq2 / ComBat_seq 
 
@@ -111,15 +109,39 @@ counts_corrected <- ComBat_seq(
   group  = sample_group
 )
 
+stopifnot(all(colnames(counts_corrected) == rownames(col_data)))
+
 ### Define Feature Set
 
 # Genes identified as significant from DESeq2 analysis
 # signatures <- c("RNU6-289P","RN7SKP270","FAM90A11","RNU6ATAC36P","HAVCR1P1", "ENSG00000278215")
 
 #genes identified by Lima
-signatures <- gene_types %>%
-  filter(str_remove(Geneid, "\\..*") %in% c("ENSG00000156738", "ENSG00000167157")) %>%
-  pull(name)
+signatures <-  c("ENSG00000156738", "ENSG00000167157")
+
+#top 100 from limma
+#signatures <- c("MS4A1","PRRX2","TXLNGY","CAMK4","H2AC12",
+#                "SPC24","PIK3R6","NOX1","MTNR1A","RPS4Y1",
+#                "DDX3Y","EPOR","KDM5D","USP9Y","ASPM",
+#                "PTPN20","ZFP57","NLGN4Y","GPR27","SLC26A4-AS1",
+#                "PREX2","GPR68","ZFY","C3orf70","ZNF683",
+#                "CPED1","RHBDL3","NCAPG","XIST","GPR143","ESCO2",
+#                "PRKY","TTTY14","LINC00278","AKAP5","ENSG00000300770",
+#                "CLCNKA","ENSG00000307688","H2BC14","PLCL1",
+#                "UTY","SAA1","SGO1","PADI2","SYT8","GCSAM","HENMT1",
+#                "ICOS","ENSG00000294508","EIF1AY","TLR10",
+#                "SAA2", "FCRL5","ATP6AP1-DT","NLRP2","XK",
+#                "CCDC141","HOXB3","ITGAD","CD180",
+#                "ENSG00000288049","MARCHF1","ARHGAP15","ENSG00000295911",
+#                "ENSG00000248242","ENSG00000273906","SLC26A4",
+#                "ENSG00000262714","F11-AS1",
+#                "KBTBD8","SH3D21","CD3D","CD8B","LINC02649","DPP4",
+#                "RAPGEF6","ENSG00000307289","TDRP","LAX1","TSPAN2",
+#                "CRELD2","CENPE","SCAND3","ADGRG5","PDE11A",
+#                "ENSG00000307241","HPS1-AS1","TBL1Y","TRPC6",
+#                "GASK1B","ACTL10","FCRL4","ENSG00000267317","MEF2C","TOX",
+#                "TMEM156","SHC4","P2RY10","TBC1D22A-DT","CIB2"
+#)
 
 # NIS 4-gene signature
 # signatures <- c("SPIB", "SHISA2", "TESPA1", "CD1B")
@@ -127,11 +149,21 @@ signatures <- gene_types %>%
 #profiler genes
 #signatures <- c("FCGR1A", "GBP5", "GBP6", "C1QB", "FCGR1B", "SEPT4", "ANDKRD22")
 
-valid_genes <- intersect(
-  signatures,
-  colnames(as.data.frame(t(counts_corrected)))
-)
+# remove version numbers from Geneid
+gene_types <- gene_types %>%
+  mutate(Geneid_clean = str_remove(Geneid, "\\..*"))
 
+# convert ENS IDs to gene names if present
+lookup <- setNames(gene_types$name, gene_types$Geneid_clean)
+signatures <- ifelse(signatures %in% names(lookup),
+                     lookup[signatures],
+                     signatures)
+
+valid_genes <- intersect(signatures, rownames(counts_corrected))
+
+if (length(valid_genes) == 0) {
+  stop("No valid genes found in dataset.")
+}
 
 ### Build Model Data Frames 
 
@@ -251,13 +283,15 @@ run_knn <- function(data, fit_control) {
 
 run_pls <- function(data, fit_control) {
   set.seed(42)
+  max_comp <- min(ncol(data) - 1, 20) 
   fit <- train(
     status ~ .,
     data       = data,
     method     = "pls",
     metric     = "ROC",
     trControl  = fit_control,
-    preProcess = c("center", "scale")
+    preProcess = c("center", "scale"),
+    tuneGrid = expand.grid(ncomp = 1:max_comp)
   )
   fm  <- evalm(fit, gnames = "PLS", plots = "r", fsize = 11)
   fm$roc + theme_SL2() + theme(legend.position = "bottom")
