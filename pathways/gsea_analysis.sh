@@ -10,16 +10,56 @@ set -euo pipefail
 GSEA_EXEC_PATH="/mnt/c/Users/bryan/my_scripts/GSEA_4.4.0/gsea-cli.sh"
 GCT_FILE="../pathway_artifacts/counts_sex_corrected.gct"
 CLS_FILE="../pathway_artifacts/phenotypes.cls"
-GENESET_FILE="../pathway_artifacts/msigdb/h.all.v2026.1.Hs.symbols.gmt"
 
-# Edit this outdirectory to be what you want.
-OUT_DIR="../pathway_artifacts/Hallmark_GSEA"
+GENESET_FILE=""
+OUT_DIR=""
+
+usage() {
+	echo "Usage: $0 --geneset <GENESET_FILE.gmt> --outdir <OUT_DIR>"
+	echo ""
+	echo "Required flags:"
+	echo "  -g, --geneset   Path to gene set GMT file"
+	echo "  -o, --outdir    Output directory for GSEA results"
+	echo "  -h, --help      Show this help message"
+	echo ""
+	echo "Example:"
+	echo "  $0 --geneset ../pathway_artifacts/msigdb/h.all.v2026.1.Hs.symbols.gmt --outdir ../pathway_artifacts/Hallmark_GSEA"
+}
+
+while [[ "$#" -gt 0 ]]; do
+	case "$1" in
+		-g|--geneset)
+			GENESET_FILE="${2:-}"
+			shift 2
+			;;
+		-o|--outdir)
+			OUT_DIR="${2:-}"
+			shift 2
+			;;
+		-h|--help)
+			usage
+			exit 0
+			;;
+		*)
+			echo "Unknown argument: $1"
+			usage
+			exit 1
+			;;
+	esac
+done
+
+if [[ -z "$GENESET_FILE" || -z "$OUT_DIR" ]]; then
+	echo "Both --geneset and --outdir are required."
+	usage
+	exit 1
+fi
+
 RPT_LABEL="gsea_run"
 N_PERM="1000"
 SEED="149"
 
 if [[ -z "$GCT_FILE" || -z "$CLS_FILE" || -z "$GENESET_FILE" ]]; then
-	echo "Set GCT_FILE, CLS_FILE, and GENESET_FILE at the top of this script before running."
+	echo "Set GCT_FILE and CLS_FILE at the top of this script, and pass --geneset when running."
 	exit 1
 fi
 
