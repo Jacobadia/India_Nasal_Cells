@@ -10,21 +10,13 @@ set -euo pipefail
 GSEA_EXEC_PATH="/mnt/c/Users/bryan/my_scripts/GSEA_4.4.0/gsea-cli.sh"
 GCT_FILE="../pathway_artifacts/counts_sex_corrected.gct"
 CLS_FILE="../pathway_artifacts/phenotypes.cls"
-GENESET_FILE="../pathway_artifacts/msigdb/c2.cp.kegg_medicus.v2026.1.Hs.symbols.gmt"
-
-# If you need phenotype subset syntax, use e.g. "./phenotypes.cls#Control_vs_Case".
-# Leave empty to use CLS_FILE directly.
-CLS_ARG=""
+GENESET_FILE="../pathway_artifacts/msigdb/h.all.v2026.1.Hs.symbols.gmt"
 
 # Edit this outdirectory to be what you want.
-OUT_DIR="../pathway_artifacts/KEGG_Medicus_GSEA"
+OUT_DIR="../pathway_artifacts/Hallmark_GSEA"
 RPT_LABEL="gsea_run"
 N_PERM="1000"
 SEED="149"
-
-if [[ -z "$CLS_ARG" ]]; then
-	CLS_ARG="$CLS_FILE"
-fi
 
 if [[ -z "$GCT_FILE" || -z "$CLS_FILE" || -z "$GENESET_FILE" ]]; then
 	echo "Set GCT_FILE, CLS_FILE, and GENESET_FILE at the top of this script before running."
@@ -57,7 +49,6 @@ echo "Running GSEA with:"
 echo "  GSEA CLI : $GSEA_EXEC_PATH"
 echo "  GCT      : $GCT_FILE"
 echo "  CLS      : $CLS_FILE"
-echo "  CLS ARG  : $CLS_ARG"
 echo "  GMT      : $GENESET_FILE"
 echo "  OUT      : $OUT_DIR"
 echo "  LABEL    : $RPT_LABEL"
@@ -66,7 +57,7 @@ echo "  SEED     : $SEED"
 
 "$GSEA_EXEC_PATH" GSEA \
 	-res "$GCT_FILE" \
-	-cls "$CLS_ARG" \
+	-cls "$CLS_FILE" \
 	-gmx "$GENESET_FILE" \
 	-out "$OUT_DIR" \
 	-rpt_label "$RPT_LABEL" \
