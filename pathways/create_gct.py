@@ -133,6 +133,7 @@ def build_gct_rows(
 
 	for row in reader:
 		if not row:
+			print("Warning: Skipping empty row.")
 			continue
 
 		result = _process_row(row, sample_names, mapper, stats)
