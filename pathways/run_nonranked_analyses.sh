@@ -5,10 +5,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MSIGDB_DIR="$SCRIPT_DIR/../pathway_artifacts/msigdb"
 OUT_BASE_DIR="$SCRIPT_DIR/../pathway_artifacts"
-GSEA_SCRIPT="$SCRIPT_DIR/gsea_analysis.sh"
+GSEA_SCRIPT="$SCRIPT_DIR/gsea_analysis_nonranked.sh"
 
 if [[ ! -x "$GSEA_SCRIPT" ]]; then
-	echo "gsea_analysis.sh not found or not executable: $GSEA_SCRIPT"
+	echo "gsea_analysis_nonranked.sh not found or not executable: $GSEA_SCRIPT"
 	exit 1
 fi
 
