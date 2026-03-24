@@ -87,7 +87,7 @@ echo "  LABEL    : $RPT_LABEL"
 echo "  NPERM    : $N_PERM"
 echo "  SEED     : $SEED"
 
-"$GSEA_EXEC_PATH" Preranked \
+"$GSEA_EXEC_PATH" GSEAPreranked \
 	-rnk "$RANKED_FILE" \
 	-gmx "$GENESET_FILE" \
 	-out "$OUT_DIR" \
