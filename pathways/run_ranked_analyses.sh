@@ -3,7 +3,7 @@
 set -euo pipefail
 
 # Path to the ranked file (edit as needed)
-RANKED_FILE="../pathway_artifacts/lpm_protein_control_nothing.rnk"
+RANKED_FILE="../pathway_artifacts/lpm_protein_control_sex.rnk"
 
 # Path to the GSEA ranked analysis script
 GSEA_RANKED_SCRIPT="./gsea_analysis_ranked.sh"
@@ -23,12 +23,12 @@ GMT_FILES=(
 
 # Output directories for each analysis (edit as needed)
 OUTDIRS=(
-	"../pathway_artifacts/Hallmark_ranked_GSEA"
-	"../pathway_artifacts/ImmuneSigDB_ranked_GSEA"
-	"../pathway_artifacts/Vax_ranked_GSEA"
-	"../pathway_artifacts/Reactome_ranked_GSEA"
-	"../pathway_artifacts/KEGG_Medicus_ranked_GSEA"
-	"../pathway_artifacts/KEGG_Legacy_ranked_GSEA"
+	"../pathway_artifacts/Hallmark_ranked_sex_GSEA"
+	"../pathway_artifacts/ImmuneSigDB_ranked_sex_GSEA"
+	"../pathway_artifacts/Vax_ranked_sex_GSEA"
+	"../pathway_artifacts/Reactome_ranked_sex_GSEA"
+	"../pathway_artifacts/KEGG_Medicus_ranked_sex_GSEA"
+	"../pathway_artifacts/KEGG_Legacy_ranked_sex_GSEA"
 )
 
 for i in "${!GMT_FILES[@]}"; do
