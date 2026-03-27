@@ -58,48 +58,40 @@ full_deg_results_file, significant_deg_results_file) {
 suppressMessages(suppressWarnings(library(limma)))
 
 run_limma_analysis <- function(counts, conditionData, design_formula,
-full_deg_results_file, significant_deg_results_file) {
+                              full_deg_results_file, significant_deg_results_file) {
   # Ensure sample order matches counts matrix columns
   conditionData <- conditionData[colnames(counts), , drop = FALSE]
 
-  # Create DGEList with group information from condition column
-  group <- factor(conditionData$condition)
-  d0 <- DGEList(counts = as.matrix(counts), group = group)
-
-  # Filter lowly expressed genes
-  keep <- filterByExpr(d0, group = group)
+  # Create DGEList
+  d0 <- DGEList(counts = as.matrix(counts))
+  # technically I'm not supplying a filter here so its
+  # using the default. We'll need to discuss that.
+  keep <- filterByExpr(d0, group = conditionData$condition)
   d <- d0[keep, , keep.lib.sizes = FALSE]
 
-  # Normalize using TMM normalization
+  # perfrom a TMM normalization to account for some samples
+  # having more counts than others.
   d <- calcNormFactors(d)
 
-  # Create design matrix from the provided formula
+  # Create design matrix from the provided formula (should always be ~0 + ...)
   design <- model.matrix(design_formula, data = conditionData)
-
-  # Voom transformation for variance stabilization
+  # performs voom transformation to log CPM
   voom.d <- voom(d, design, plot = FALSE)
-
-  # Fit linear model
   fit <- lmFit(voom.d, design)
-
-  # Match standalone limma workflow when design is ~ condition:
-  # use no-intercept group design and an explicit active-vs-latent contrast.
-  if (identical(as.character(design_formula), as.character(~ condition))) {
-    group <- relevel(factor(conditionData$condition), ref = "latent")
-    design_no_intercept <- model.matrix(~ 0 + group)
-    voom_group <- voom(d, design_no_intercept, plot = FALSE)
-    fit_group <- lmFit(voom_group, design_no_intercept)
-
-    contrast <- makeContrasts(active_vs_latent = groupactive - grouplatent,
-                              levels = colnames(design_no_intercept))
-    fit_contrast <- contrasts.fit(fit_group, contrast)
-    fit_contrast <- eBayes(fit_contrast)
-    res <- topTable(fit_contrast, number = Inf, sort.by = "P")
+  fit <- eBayes(fit)
+  # Always auto-generate contrast for 'active' vs 'latent'
+  colnames_design <- colnames(design)
+  active_col <- grep("active", colnames_design, value = TRUE)
+  latent_col <- grep("latent", colnames_design, value = TRUE)
+  if (length(active_col) == 1 && length(latent_col) == 1) {
+    contrast_str <- sprintf("%s - %s", active_col, latent_col)
+    print(paste("Using contrast:", contrast_str))
+    contrast <- makeContrasts(contrasts = contrast_str, levels = colnames(design))
+    fit2 <- contrasts.fit(fit, contrast)
+    fit2 <- eBayes(fit2)
+    res <- topTable(fit2, number = Inf, sort.by = "P")
   } else {
-    # For adjusted models (sex/age covariates), use the condition coefficient
-    fit <- eBayes(fit)
-    coef_name <- grep("condition", colnames(design), value = TRUE)
-    res <- topTable(fit, coef = coef_name, number = Inf, sort.by = "P")
+    stop("Could not automatically determine 'active' and 'latent' columns in design matrix.")
   }
 
   # Rename columns to match DESeq2 output convention used elsewhere
@@ -107,7 +99,6 @@ full_deg_results_file, significant_deg_results_file) {
   colnames(res)[colnames(res) == "adj.P.Val"] <- "padj"
 
   write.table(res, full_deg_results_file, sep = "\t", quote = FALSE, row.names = TRUE)
-
   res_significant <- res[!is.na(res$padj) & res$padj < 0.05, ]
   write.table(res_significant, significant_deg_results_file,
               sep = "\t", quote = FALSE, row.names = TRUE)
@@ -115,24 +106,24 @@ full_deg_results_file, significant_deg_results_file) {
 
 run_limma_control_nothing <- function(counts, conditionData,
 full_deg_results_file, significant_deg_results_file) {
-  run_limma_analysis(counts, conditionData, ~ condition,
+  run_limma_analysis(counts, conditionData, ~0 + condition,
   full_deg_results_file, significant_deg_results_file)
 }
 
 run_limma_control_sex <- function(counts, conditionData,
 full_deg_results_file, significant_deg_results_file) {
-  run_limma_analysis(counts, conditionData, ~ sex + condition,
+  run_limma_analysis(counts, conditionData, ~0 + condition + sex,
   full_deg_results_file, significant_deg_results_file)
 }
 
 run_limma_control_age <- function(counts, conditionData,
 full_deg_results_file, significant_deg_results_file) {
-  run_limma_analysis(counts, conditionData, ~ age + condition,
+  run_limma_analysis(counts, conditionData, ~0 + condition + age,
   full_deg_results_file, significant_deg_results_file)
 }
 
 run_limma_control_sex_and_age <- function(counts, conditionData,
 full_deg_results_file, significant_deg_results_file) {
-  run_limma_analysis(counts, conditionData, ~ sex + age + condition,
+  run_limma_analysis(counts, conditionData, ~0 + condition + sex + age,
   full_deg_results_file, significant_deg_results_file)
 }
