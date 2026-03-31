@@ -127,7 +127,7 @@ def get_upregulation_legend_handles(upreg_palette):
 def get_dot_size_legend_handles():
     padj_legend = [0.05, 0.01, 0.001, 1e-6]
     size_legend = [-np.log10(p) * 100 for p in padj_legend]
-    labels = [f"padj={p}" for p in padj_legend[:-1]] + [r"padj < 1e-6"]
+    labels = [f"padj<{p}" for p in padj_legend[:-1]] + [r"padj < 1e-6"]
     handles = [plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k') for s in size_legend]
     return handles, labels
 
