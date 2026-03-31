@@ -11,10 +11,10 @@ OUTPUT_PATH = "../pathway_artifacts/gsea_publication_figure.png"
 
 GSEA_DIRS = (
     "../pathway_artifacts/Hallmark_ranked_sex_GSEA",
-    "../pathway_artifacts/ImmuneSigDB_ranked_sex_GSEA",
     "../pathway_artifacts/KEGG_Legacy_ranked_sex_GSEA",
-    "../pathway_artifacts/KEGG_Medicus_ranked_sex_GSEA",
     "../pathway_artifacts/Reactome_ranked_sex_GSEA",
+    "../pathway_artifacts/ImmuneSigDB_ranked_sex_GSEA",
+    "../pathway_artifacts/KEGG_Medicus_ranked_sex_GSEA",
     "../pathway_artifacts/Vax_ranked_sex_GSEA",
 )
 
@@ -160,7 +160,7 @@ def main():
         handles=upreg_handles,
         labels=[f"Upregulated in: {lab}" for lab in upreg_labels],
         loc="upper right",
-        bbox_to_anchor=(0.98, 0.995),  # shifted further down
+        bbox_to_anchor=(0.98, 0.98),  # shifted further down
         frameon=True,
         fontsize=10,
         borderaxespad=0.5,
@@ -172,7 +172,7 @@ def main():
         handles=dot_handles,
         labels=[f"Dot size: {lab}" for lab in dot_labels],
         loc="upper right",
-        bbox_to_anchor=(0.20, 0.995),  # shifted further down
+        bbox_to_anchor=(0.22, 0.98),  # shifted further down
         frameon=True,
         fontsize=10,
         borderaxespad=0.5,  # increased for a taller legend box
@@ -190,7 +190,7 @@ def main():
 
     fig.suptitle("GSEA Results: Top Pathways per Database", fontsize=18, y=0.99)
     # Reserve even more space at the top for legends
-    plt.tight_layout(rect=[0, 0, 0.97, 0.92])
+    plt.tight_layout(rect=[0, 0, 0.97, 0.95])
     plt.savefig(OUTPUT_PATH, dpi=300)
     print(f"Saved GSEA figure to {OUTPUT_PATH}")
 
