@@ -74,7 +74,6 @@ def collect_gsea_tables(gsea_dirs):
 
 import numpy as np
 import matplotlib as mpl
-import seaborn as sns
 
 def setup_figure(n_panels, ncols, nrows, figsize):
     fig, axes = plt.subplots(nrows, ncols, figsize=figsize, squeeze=False)
@@ -109,7 +108,7 @@ def plot_panel(ax, dbname, df, nes_lim, upreg_palette):
         linewidth=0.5
     )
     ax.set_yticks(y_pos)
-    ax.set_yticklabels([textwrap.fill(n, 30) for n in y_labels])
+    ax.set_yticklabels([textwrap.fill(n, 60) for n in y_labels])
     ax.set_xlabel("Normalized Enrichment Score (NES)")
     ax.set_title(dbname.replace("_ranked_sex_GSEA", ""))
     ax.invert_yaxis()
@@ -133,7 +132,7 @@ def get_dot_size_legend_handles():
 def main():
     table_data = collect_gsea_tables(GSEA_DIRS)
     n_panels = len(table_data)
-    fig, axes, nrows, ncols = setup_figure(n_panels, ncols=2, nrows=3, figsize=(14, 15))
+    fig, axes, nrows, ncols = setup_figure(n_panels, ncols=2, nrows=3, figsize=(18, 15))
     upreg_palette = {"Active": "#1f77b4", "Latent": "#d62728"}
     nes_lim = get_global_nes_limits(table_data)
 
