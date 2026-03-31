@@ -7,7 +7,7 @@ import textwrap
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-OUTPUT_PATH = "../pathway_artifacts/gsea_publication_table.png"
+OUTPUT_PATH = "../pathway_artifacts/gsea_publication_figure.png"
 
 GSEA_DIRS = (
     "../pathway_artifacts/Hallmark_ranked_sex_GSEA",
@@ -72,8 +72,83 @@ def collect_gsea_tables(gsea_dirs):
 
 
 def main():
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import matplotlib as mpl
+    import seaborn as sns
+
     table_data = collect_gsea_tables(GSEA_DIRS)
-    print(table_data)
+
+    n_panels = len(table_data)
+    ncols = 3
+    nrows = int(np.ceil(n_panels / ncols))
+    fig, axes = plt.subplots(nrows, ncols, figsize=(18, 10), squeeze=False)
+    plt.subplots_adjust(wspace=0.5, hspace=0.4)
+
+    # Color palette for upregulation
+    upreg_palette = {"Active": "#1f77b4", "Latent": "#d62728"}
+
+    for idx, (dbname, df) in enumerate(table_data):
+        row, col = divmod(idx, ncols)
+        ax = axes[row][col]
+        # Sort by NES for y-axis order
+        df_sorted = df.sort_values("NES", ascending=True)
+        y_labels = df_sorted["NAME"]
+        y_pos = np.arange(len(y_labels))
+        sizes = -np.log10(df_sorted["FDR q-val"].replace(0, 1e-300)) * 100  # scale for visibility
+        colors = df_sorted["Upregulated in"].map(upreg_palette)
+
+        scatter = ax.scatter(
+            df_sorted["NES"],
+            y_pos,
+            s=sizes,
+            c=colors,
+            alpha=0.8,
+            edgecolor="k",
+            linewidth=0.5
+        )
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels([textwrap.fill(n, 30) for n in y_labels])
+        ax.set_xlabel("Normalized Enrichment Score (NES)")
+        ax.set_title(dbname.replace("_ranked_sex_GSEA", ""))
+        ax.invert_yaxis()
+        # Add grid
+        ax.grid(axis="x", linestyle=":", alpha=0.5)
+
+    # Remove empty subplots
+    for idx in range(n_panels, nrows * ncols):
+        row, col = divmod(idx, ncols)
+        fig.delaxes(axes[row][col])
+
+    # Custom legend for upregulation
+    handles = [mpl.lines.Line2D([0], [0], marker='o', color='w', label=lab,
+                                 markerfacecolor=col, markersize=10, markeredgecolor='k')
+               for lab, col in upreg_palette.items()]
+    fig.legend(handles=handles, labels=list(upreg_palette.keys()), title="Upregulated in",
+               loc="upper right", bbox_to_anchor=(0.98, 0.98))
+
+    # Dot size legend
+    from matplotlib.legend import Legend
+    import matplotlib.patches as mpatches
+    import matplotlib.lines as mlines
+    import matplotlib as mpl
+    import numpy as np
+    # Example padj values for legend
+    padj_legend = [0.05, 0.01, 0.001]
+    size_legend = [-np.log10(p) * 100 for p in padj_legend]
+    labels = [f"padj={p}" for p in padj_legend]
+    for i, (s, l) in enumerate(zip(size_legend, labels)):
+        fig.scatter = plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k', label=l)
+    leg2 = ax.legend(loc='lower right', title='Dot size: -log10(padj)',
+                     handles=[plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k') for s in size_legend],
+                     labels=labels, frameon=True)
+    fig.add_artist(leg2)
+
+    fig.suptitle("GSEA Results: Top Pathways per Database", fontsize=18, y=0.99)
+    plt.tight_layout(rect=[0, 0, 0.97, 0.96])
+    plt.savefig(OUTPUT_PATH, dpi=300)
+    print(f"Saved GSEA figure to {OUTPUT_PATH}")
 
 if __name__ == "__main__":
     main()
