@@ -113,7 +113,9 @@ def plot_panel(ax, dbname, df, nes_lim, upreg_palette):
     ax.set_title(dbname.replace("_ranked_sex_GSEA", ""))
     ax.invert_yaxis()
     ax.grid(axis="x", linestyle=":", alpha=0.5)
-    ax.set_xlim(nes_lim)
+    # Expand x-axis upper limit by 1 unit
+    xmin, xmax = nes_lim
+    ax.set_xlim(xmin - 1, xmax + 1)
 
 def get_upregulation_legend_handles(upreg_palette):
     handles = [mpl.lines.Line2D([0], [0], marker='o', color='w', label=lab,
