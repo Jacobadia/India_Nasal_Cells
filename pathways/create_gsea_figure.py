@@ -71,83 +71,89 @@ def collect_gsea_tables(gsea_dirs):
 
 
 
-def main():
 
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import matplotlib as mpl
-    import seaborn as sns
+import numpy as np
+import matplotlib as mpl
+import seaborn as sns
 
-    table_data = collect_gsea_tables(GSEA_DIRS)
-
-    n_panels = len(table_data)
-    ncols = 3
+def setup_figure(n_panels, ncols=3, figsize=(18, 10)):
     nrows = int(np.ceil(n_panels / ncols))
-    fig, axes = plt.subplots(nrows, ncols, figsize=(18, 10), squeeze=False)
+    fig, axes = plt.subplots(nrows, ncols, figsize=figsize, squeeze=False)
     plt.subplots_adjust(wspace=0.5, hspace=0.4)
+    return fig, axes, nrows, ncols
 
-    # Color palette for upregulation
-    upreg_palette = {"Active": "#1f77b4", "Latent": "#d62728"}
+def get_global_nes_limits(table_data):
+    all_nes = pd.concat([df["NES"] for _, df in table_data])
+    nes_min = all_nes.min()
+    nes_max = all_nes.max()
+    nes_abs = max(abs(nes_min), abs(nes_max))
+    return (-nes_abs, nes_abs)
 
-    for idx, (dbname, df) in enumerate(table_data):
-        row, col = divmod(idx, ncols)
-        ax = axes[row][col]
-        # Sort by NES for y-axis order
-        df_sorted = df.sort_values("NES", ascending=True)
-        y_labels = df_sorted["NAME"]
-        y_pos = np.arange(len(y_labels))
-        # Cap -log10(padj) to avoid huge dots for padj=0
-        min_padj = 1e-6  # anything smaller will be treated as this value
-        capped_log10 = -np.log10(df_sorted["FDR q-val"].replace(0, min_padj))
-        capped_log10 = np.clip(capped_log10, None, 10)  # cap at 10
-        sizes = capped_log10 * 100  # scale for visibility
-        colors = df_sorted["Upregulated in"].map(upreg_palette)
+def plot_panel(ax, dbname, df, nes_lim, upreg_palette):
+    df_sorted = df.sort_values("NES", ascending=True)
+    y_labels = df_sorted["NAME"]
+    y_pos = np.arange(len(y_labels))
+    min_padj = 1e-6
+    capped_log10 = -np.log10(df_sorted["FDR q-val"].replace(0, min_padj))
+    capped_log10 = np.clip(capped_log10, None, 10)
+    sizes = capped_log10 * 100
+    colors = df_sorted["Upregulated in"].map(upreg_palette)
+    scatter = ax.scatter(
+        df_sorted["NES"],
+        y_pos,
+        s=sizes,
+        c=colors,
+        alpha=0.8,
+        edgecolor="k",
+        linewidth=0.5
+    )
+    ax.set_yticks(y_pos)
+    ax.set_yticklabels([textwrap.fill(n, 30) for n in y_labels])
+    ax.set_xlabel("Normalized Enrichment Score (NES)")
+    ax.set_title(dbname.replace("_ranked_sex_GSEA", ""))
+    ax.invert_yaxis()
+    ax.grid(axis="x", linestyle=":", alpha=0.5)
+    ax.set_xlim(nes_lim)
 
-        scatter = ax.scatter(
-            df_sorted["NES"],
-            y_pos,
-            s=sizes,
-            c=colors,
-            alpha=0.8,
-            edgecolor="k",
-            linewidth=0.5
-        )
-        ax.set_yticks(y_pos)
-        ax.set_yticklabels([textwrap.fill(n, 30) for n in y_labels])
-        ax.set_xlabel("Normalized Enrichment Score (NES)")
-        ax.set_title(dbname.replace("_ranked_sex_GSEA", ""))
-        ax.invert_yaxis()
-        # Add grid
-        ax.grid(axis="x", linestyle=":", alpha=0.5)
-
-    # Remove empty subplots
-    for idx in range(n_panels, nrows * ncols):
-        row, col = divmod(idx, ncols)
-        fig.delaxes(axes[row][col])
-
-    # Custom legend for upregulation
+def add_upregulation_legend(fig, upreg_palette):
     handles = [mpl.lines.Line2D([0], [0], marker='o', color='w', label=lab,
                                  markerfacecolor=col, markersize=10, markeredgecolor='k')
                for lab, col in upreg_palette.items()]
     fig.legend(handles=handles, labels=list(upreg_palette.keys()), title="Upregulated in",
                loc="upper right", bbox_to_anchor=(0.98, 0.98))
 
-    # Dot size legend
-    from matplotlib.legend import Legend
-    import matplotlib.patches as mpatches
-    import matplotlib.lines as mlines
-    import matplotlib as mpl
-    import numpy as np
-    # Example padj values for legend
+def add_dot_size_legend(ax, fig):
     padj_legend = [0.05, 0.01, 0.001]
     size_legend = [-np.log10(p) * 100 for p in padj_legend]
     labels = [f"padj={p}" for p in padj_legend]
-    for i, (s, l) in enumerate(zip(size_legend, labels)):
-        fig.scatter = plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k', label=l)
+    for s, l in zip(size_legend, labels):
+        plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k', label=l)
     leg2 = ax.legend(loc='lower right', title='Dot size: -log10(padj)',
                      handles=[plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k') for s in size_legend],
                      labels=labels, frameon=True)
     fig.add_artist(leg2)
+
+def main():
+    table_data = collect_gsea_tables(GSEA_DIRS)
+    n_panels = len(table_data)
+    fig, axes, nrows, ncols = setup_figure(n_panels)
+    upreg_palette = {"Active": "#1f77b4", "Latent": "#d62728"}
+    nes_lim = get_global_nes_limits(table_data)
+
+    for idx, (dbname, df) in enumerate(table_data):
+        row, col = divmod(idx, ncols)
+        ax = axes[row][col]
+        plot_panel(ax, dbname, df, nes_lim, upreg_palette)
+
+    # Remove empty subplots
+    for idx in range(n_panels, nrows * ncols):
+        row, col = divmod(idx, ncols)
+        fig.delaxes(axes[row][col])
+
+    add_upregulation_legend(fig, upreg_palette)
+    # Add dot size legend to the last used axis
+    last_ax = axes[(n_panels-1)//ncols][(n_panels-1)%ncols]
+    add_dot_size_legend(last_ax, fig)
 
     fig.suptitle("GSEA Results: Top Pathways per Database", fontsize=18, y=0.99)
     plt.tight_layout(rect=[0, 0, 0.97, 0.96])
