@@ -117,23 +117,19 @@ def plot_panel(ax, dbname, df, nes_lim, upreg_palette):
     ax.grid(axis="x", linestyle=":", alpha=0.5)
     ax.set_xlim(nes_lim)
 
-def add_upregulation_legend(fig, upreg_palette):
+def get_upregulation_legend_handles(upreg_palette):
     handles = [mpl.lines.Line2D([0], [0], marker='o', color='w', label=lab,
                                  markerfacecolor=col, markersize=10, markeredgecolor='k')
                for lab, col in upreg_palette.items()]
-    fig.legend(handles=handles, labels=list(upreg_palette.keys()), title="Upregulated in",
-               loc="upper right", bbox_to_anchor=(0.98, 0.98))
+    labels = list(upreg_palette.keys())
+    return handles, labels
 
-def add_dot_size_legend(ax, fig):
+def get_dot_size_legend_handles():
     padj_legend = [0.05, 0.01, 0.001]
     size_legend = [-np.log10(p) * 100 for p in padj_legend]
     labels = [f"padj={p}" for p in padj_legend]
-    for s, l in zip(size_legend, labels):
-        plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k', label=l)
-    leg2 = ax.legend(loc='lower right', title='Dot size: -log10(padj)',
-                     handles=[plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k') for s in size_legend],
-                     labels=labels, frameon=True)
-    fig.add_artist(leg2)
+    handles = [plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k') for s in size_legend]
+    return handles, labels
 
 def main():
     table_data = collect_gsea_tables(GSEA_DIRS)
@@ -152,13 +148,45 @@ def main():
         row, col = divmod(idx, ncols)
         fig.delaxes(axes[row][col])
 
-    add_upregulation_legend(fig, upreg_palette)
-    # Add dot size legend to the last used axis
-    last_ax = axes[(n_panels-1)//ncols][(n_panels-1)%ncols]
-    add_dot_size_legend(last_ax, fig)
+
+
+    # Separate legends: Upregulation and Dot Size, both at top right, side by side
+    upreg_handles, upreg_labels = get_upregulation_legend_handles(upreg_palette)
+    dot_handles, dot_labels = get_dot_size_legend_handles()
+
+
+    # Upregulation legend (top right, shifted further down)
+    leg1 = fig.legend(
+        handles=upreg_handles,
+        labels=[f"Upregulated in: {lab}" for lab in upreg_labels],
+        loc="upper right",
+        bbox_to_anchor=(0.98, 0.995),  # shifted further down
+        frameon=True,
+        fontsize=10,
+        borderaxespad=0.5,
+        bbox_transform=fig.transFigure
+    )
+
+    # Dot size legend (right of upregulation legend, same height)
+    leg2 = fig.legend(
+        handles=dot_handles,
+        labels=[f"Dot size: {lab}" for lab in dot_labels],
+        loc="upper right",
+        bbox_to_anchor=(0.78, 0.995),  # shifted further down
+        frameon=True,
+        fontsize=10,
+        borderaxespad=0.5,
+        bbox_transform=fig.transFigure
+    )
+
+    # Make sure both legends are drawn
+    fig.add_artist(leg1)
+    fig.add_artist(leg2)
+
 
     fig.suptitle("GSEA Results: Top Pathways per Database", fontsize=18, y=0.99)
-    plt.tight_layout(rect=[0, 0, 0.97, 0.96])
+    # Reserve even more space at the top for legends
+    plt.tight_layout(rect=[0, 0, 0.97, 0.92])
     plt.savefig(OUTPUT_PATH, dpi=300)
     print(f"Saved GSEA figure to {OUTPUT_PATH}")
 
