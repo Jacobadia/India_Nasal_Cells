@@ -91,7 +91,9 @@ def get_global_nes_limits(table_data):
 
 def plot_panel(ax, dbname, df, nes_lim, upreg_palette):
     df_sorted = df.sort_values("NES", ascending=True)
-    y_labels = df_sorted["NAME"]
+    def snake_to_title(s):
+        return s.replace("_", " ").title()
+    y_labels = df_sorted["NAME"].apply(snake_to_title)
     y_pos = np.arange(len(y_labels))
     min_padj = 1e-6
     capped_log10 = -np.log10(df_sorted["FDR q-val"].replace(0, min_padj))
