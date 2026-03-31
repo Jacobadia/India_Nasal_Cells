@@ -96,7 +96,11 @@ def main():
         df_sorted = df.sort_values("NES", ascending=True)
         y_labels = df_sorted["NAME"]
         y_pos = np.arange(len(y_labels))
-        sizes = -np.log10(df_sorted["FDR q-val"].replace(0, 1e-300)) * 100  # scale for visibility
+        # Cap -log10(padj) to avoid huge dots for padj=0
+        min_padj = 1e-6  # anything smaller will be treated as this value
+        capped_log10 = -np.log10(df_sorted["FDR q-val"].replace(0, min_padj))
+        capped_log10 = np.clip(capped_log10, None, 10)  # cap at 10
+        sizes = capped_log10 * 100  # scale for visibility
         colors = df_sorted["Upregulated in"].map(upreg_palette)
 
         scatter = ax.scatter(
