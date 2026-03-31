@@ -76,10 +76,9 @@ import numpy as np
 import matplotlib as mpl
 import seaborn as sns
 
-def setup_figure(n_panels, ncols=3, figsize=(18, 10)):
-    nrows = int(np.ceil(n_panels / ncols))
+def setup_figure(n_panels, ncols, nrows, figsize):
     fig, axes = plt.subplots(nrows, ncols, figsize=figsize, squeeze=False)
-    plt.subplots_adjust(wspace=0.5, hspace=0.4)
+    plt.subplots_adjust(wspace=0.5, hspace=0.6)  # more vertical space
     return fig, axes, nrows, ncols
 
 def get_global_nes_limits(table_data):
@@ -127,14 +126,14 @@ def get_upregulation_legend_handles(upreg_palette):
 def get_dot_size_legend_handles():
     padj_legend = [0.05, 0.01, 0.001, 1e-6]
     size_legend = [-np.log10(p) * 100 for p in padj_legend]
-    labels = [f"padj={p}" for p in padj_legend[:-1]] + [r"padj < 1e-6 (largest dot)"]
+    labels = [f"padj={p}" for p in padj_legend[:-1]] + [r"padj < 1e-6"]
     handles = [plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k') for s in size_legend]
     return handles, labels
 
 def main():
     table_data = collect_gsea_tables(GSEA_DIRS)
     n_panels = len(table_data)
-    fig, axes, nrows, ncols = setup_figure(n_panels)
+    fig, axes, nrows, ncols = setup_figure(n_panels, ncols=2, nrows=3, figsize=(14, 15))
     upreg_palette = {"Active": "#1f77b4", "Latent": "#d62728"}
     nes_lim = get_global_nes_limits(table_data)
 
@@ -172,7 +171,7 @@ def main():
         handles=dot_handles,
         labels=[f"Dot size: {lab}" for lab in dot_labels],
         loc="upper right",
-        bbox_to_anchor=(0.85, 0.995),  # shifted further down
+        bbox_to_anchor=(0.20, 0.995),  # shifted further down
         frameon=True,
         fontsize=10,
         borderaxespad=0.5,  # increased for a taller legend box
