@@ -10,4 +10,5 @@ This repository contains data and code used in the analysis of the RNA sequencin
 5. **Limma Analysis**
 6. **TBSignatureProfiler**
 7. **ROC Pipeline**
-8. **Figure Creation**
+8. **GSEA Pathway Analysis**
+9. **Figure Creation**
