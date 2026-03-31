@@ -125,9 +125,9 @@ def get_upregulation_legend_handles(upreg_palette):
     return handles, labels
 
 def get_dot_size_legend_handles():
-    padj_legend = [0.05, 0.01, 0.001]
+    padj_legend = [0.05, 0.01, 0.001, 1e-6]
     size_legend = [-np.log10(p) * 100 for p in padj_legend]
-    labels = [f"padj={p}" for p in padj_legend]
+    labels = [f"padj={p}" for p in padj_legend[:-1]] + [r"padj < 1e-6 (largest dot)"]
     handles = [plt.scatter([], [], s=s, c='gray', alpha=0.7, edgecolor='k') for s in size_legend]
     return handles, labels
 
@@ -167,16 +167,20 @@ def main():
         bbox_transform=fig.transFigure
     )
 
-    # Dot size legend (right of upregulation legend, same height)
+    # Dot size legend (vertical, left of upregulation legend, same height)
     leg2 = fig.legend(
         handles=dot_handles,
         labels=[f"Dot size: {lab}" for lab in dot_labels],
         loc="upper right",
-        bbox_to_anchor=(0.78, 0.995),  # shifted further down
+        bbox_to_anchor=(0.85, 0.995),  # shifted further down
         frameon=True,
         fontsize=10,
-        borderaxespad=0.5,
-        bbox_transform=fig.transFigure
+        borderaxespad=0.5,  # increased for a taller legend box
+        bbox_transform=fig.transFigure,
+        ncol=1,  # vertical legend
+        labelspacing=1.0,  # moderate spacing between labels
+        handleheight=1.5,  # moderate height for each handle
+        handletextpad=1.0  # moderate space between handle and text
     )
 
     # Make sure both legends are drawn
