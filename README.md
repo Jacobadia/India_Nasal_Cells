@@ -48,7 +48,7 @@ cd deg
 - Run the following code in your shell to perform the Differential Gene Expression analysis:
 
 ```bash
-Rscript deg/deg_analyses.R
+Rscript deg_analyses.R
 ```
 
 - Note: we have commented out all the code for the analyses that we didn't use in our results in the interest of saving you time (It will take another 10-15 minutes if you choose to uncomment the other tests). If you want to run the other analyses too, simply uncomment the code for those analyses found at the very end of the script and run the script again.
