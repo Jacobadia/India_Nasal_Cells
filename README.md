@@ -3,20 +3,95 @@ This repository contains data and code used in the analysis of the RNA sequencin
 
 # Code (In Order)
 
+Initial notes:
+All input and output directories, except for your initial `INPUT_DIR` has already been created in the `DATA` folder. Packages were installed using Conda (installation information found here: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) and the Bioconductor installer (using this command `conda install bioconda::PACKAGE_NAME'). 
+
+`CONDA_ENV` can be found by using the following command:
+
+```bash
+conda info --base | awk '{print $1 "/etc/profile.d/conda.sh"}'
+```
+other common locations:
+- Miniconda (Default): ~/miniconda3/etc/profile.d/conda.sh
+- Anaconda (Default): ~/anaconda3/etc/profile.d/conda.sh
+- macOS Homebrew: /usr/local/Caskroom/miniconda/base/etc/profile.d/conda.sh
+- Linux (System-wide): /opt/anaconda3/etc/profile.d/conda.sh
+
+
 1. **Pre-Trim Quality Control**
+
 Package(s) needed:
 - fastqc
 - multiqc
 
-Program to run:
+Variable(s) to adjust:
+- CONDA_ENV *pathway to your conda environment source folder*
+- HOME_DIR *pathway to the base home directory* 
+- INPUT_DIR *insert pathway to fastq files; found in DATA folder in git*
+
+Other Variable(s):
+- OUTPUT_DIR *destination fastqc folder*
+- OUTPUT_DIR2 *destination folder of multiqc report*
+
+Script to run:
 - `initial_check.sh`
 
 2. **Trimming and Post-Trim Quality Control**
+
+Package(s) needed:
+- fastp
+- fastqc
+- multiqc
+
+Variable(s) to adjust:
+- CONDA_ENV *pathway to your conda environment source folder*
+- HOME_DIR *pathway to the base home directory*
+- SAMPLE_LIST *the file with the array of sample IDs in the DATA folder*
+
+Other Variable(s):
+- INPUT_DIR *pathway to fastq files; found in DATA folder in git*
+- OUTPUT_DIR *destination folder for trimmed fastq files*
+- OUTPUT_DIR2 *destination folder for fastqc folders*
+- OUTPUT_DIR3 *destination folder of multiQC report*
+
+Script to run:
 - `trim_N_check.sh`
+
 3. **STAR Alignment**
+
+Package(s) needed:
+- STAR
+- samtools
+
+Variable(s) to adjust:
+- DATA_DIR *input directory of trimmed fastq files*
+- OUTPUT_DIR *finalized bam files output from STAR aligner and samtools conversion*
+
+
+Other Variable(s):
+- SAMPLE_LIST *alternative sample list found in the DATA folder*
+- genome_index_dir *genome index files, provided in DATA folder*
+- annotations_gtf *annotations files found in DATA folder*
+
+Script to run:
 - `alignment_alt.sh`
+
 4. **Generate Feature Counts Table**
+
+Package(s) needed:
+- subread
+
+Variable(s) to adjust:
+- CONDA_ENV *pathway to your conda environment source folder*
+- GTF *annotation folder provided in DATA folder*
+
+Other Variable(s):
+- INPUT_DIR *input directory of BAM files from alignment_alt.sh output*
+- OUTPUT_DIR *output directory for the feature counts table needed for DEG analysis*
+
+Script to run:
 - `featureCounts.sh`
+
 5. **Limma Analysis**
 - Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.) and have R installed on your system. Specifically, Rscript should be on PATH.
 - Install the following R packages:
