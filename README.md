@@ -66,7 +66,7 @@ java -version
 ![IMG](reproduce_utils/gsea_dist.png)
 - In the unzipped GSEA distribution, there should be a file called "gsea-cli.sh". This file is VERY IMPORTANT. save the ABSOLUTE PATH to this file. We will use it to invoke the GSEA software from the command line.
 
-- In the pathways/gsea_analysis_ranked, there is a variable at the top called GSEA_EXEC_PATH. Set this variable to the absolute path of the gsea-cli.sh file that we just talked about. It should look something like this:
+- In the pathways/gsea_analysis_ranked.sh, there is a variable at the top called GSEA_EXEC_PATH. Set this variable to the absolute path of the gsea-cli.sh file that we just talked about. It should look something like this:
 
 ```bash
 GSEA_EXEC_PATH="/path/to/gsea-cli.sh"
