@@ -8,6 +8,22 @@ This repository contains data and code used in the analysis of the RNA sequencin
 3. **STAR Alignment**
 4. **Generate Feature Counts Table**
 5. **Limma Analysis**
+- Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.) and have R installed on your system. Specifically, Rscript should be on PATH.
+- Install the following R packages:
+    - CRAN: ggplot2
+    - Bioconductor: DESeq2, limma, edgeR
+
+  If you need to install them, use:
+
+  ```r
+  if (!requireNamespace("BiocManager", quietly = TRUE)) {
+      install.packages("BiocManager")
+  }
+
+  install.packages("ggplot2")
+  BiocManager::install(c("DESeq2", "limma", "edgeR"))
+  ```
+
 - In the root project directory, create (if it doesn't exist), a folder named
 "artifacts". In this folder, place a copy of the following files: 
     - gene_counts_corrected.tsv (This is the file generated from the STAR alignment and feature counts steps)
