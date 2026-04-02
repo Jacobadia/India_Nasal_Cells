@@ -9,6 +9,10 @@
 #SBATCH --cpus-per-task=22
 #SBATCH --mem=150G
 
+# Create initial MultiQC for quality control
+fastqc_untrimmed.sh
+run_multiqc.sh
+
 # Run Trimmomatic with our parameters
 trimmomatic.sh
 

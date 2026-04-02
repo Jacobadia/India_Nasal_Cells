@@ -4,9 +4,19 @@ This repository contains data and code used in the analysis of the RNA sequencin
 # Code (In Order)
 
 1. **Pre-Trim Quality Control**
+Package(s) needed:
+- fastqc
+- multiqc
+
+Program to run:
+- `initial_check.sh`
+
 2. **Trimming and Post-Trim Quality Control**
+- `trim_N_check.sh`
 3. **STAR Alignment**
+- `alignment_alt.sh`
 4. **Generate Feature Counts Table**
+- `featureCounts.sh`
 5. **Limma Analysis**
 - Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.) and have R installed on your system. Specifically, Rscript should be on PATH.
 - Install the following R packages:
