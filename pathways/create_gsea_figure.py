@@ -4,6 +4,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import textwrap
+import numpy as np
+import matplotlib as mpl
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -68,12 +70,6 @@ def collect_gsea_tables(gsea_dirs):
         top10 = top10[['NAME', 'FDR q-val', 'NES', 'Upregulated in']]
         table_data.append((dbname, top10))
     return table_data
-
-
-
-
-import numpy as np
-import matplotlib as mpl
 
 def setup_figure(n_panels, ncols, nrows, figsize):
     fig, axes = plt.subplots(nrows, ncols, figsize=figsize, squeeze=False)

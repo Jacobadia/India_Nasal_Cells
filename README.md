@@ -48,4 +48,69 @@ Rscript deg/deg_analyses.R
 6. **TBSignatureProfiler**
 7. **ROC Pipeline**
 8. **GSEA Pathway Analysis**
+- Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.). The wget utility should be installed on your system and be on PATH. We will be using it to download the gene sets from the MSigDB database. You can check if you have wget installed by running:
+
+```bash
+wget --version
+```
+
+- Ensure that Java in installed on your system and that the version is 21 or later. You can check your Java version by running:
+
+```bash
+java -version
+```
+
+- Ensure that you have the GSEA software (invoked via the CLI) on your system. you can download it from the Msigdb website here: https://www.gsea-msigdb.org/gsea/downloads.jsp. It may prompt you to input your email. Choose the version:
+    - GSEA v4.4.0 for the command line (all platforms)
+- Unzip the GSEA distibution. It should look something like this.
+![IMG](reproduce_utils/gsea_dist.png)
+- In the unzipped GSEA distribution, there should be a file called "gsea-cli.sh". This file is VERY IMPORTANT. save the ABSOLUTE PATH to this file. We will use it to invoke the GSEA software from the command line.
+
+- In the pathways/gsea_analysis_ranked, there is a variable at the top called GSEA_EXEC_PATH. Set this variable to the absolute path of the gsea-cli.sh file that we just talked about. It should look something like this:
+
+```bash
+GSEA_EXEC_PATH="/path/to/gsea-cli.sh"
+```
+
+- Ensure that python is installed an on PATH. Ensure that the following python packages are installed:
+    - pandas
+    - matplotlib
+    - numpy
+
+You can install these packages using pip if you don't have them already:
+
+```bash
+pip install pandas matplotlib numpy
+```
+
+- Now we can run the analysis.
+- cd into the pathways directory with:
+
+```bash
+cd pathways
+```
+
+- Run the following command to download the gene set files from msigdb.
+
+```bash
+./download_gene_sets.sh
+```
+
+- There should now be a folder pathway_artifacts/msigdb containing all the gene set files that we will use in our analysis.
+
+- run the following command to run the GSEA analysis:
+    - Note, this should take like 10 minutes if your computer is slow like mine
+
+```bash
+./run_ranked_analyses.sh
+```
+
+- Generate the pathway analysis figure with the following command:
+
+```bash
+python create_gsea_figure.py
+```
+
+- There should now be a figure called gsea_publication_figure.png in the pathway_artifacts directory. This is the figure that we used in our paper.
+
 9. **Figure Creation**
