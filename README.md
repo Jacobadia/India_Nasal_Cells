@@ -8,6 +8,21 @@ This repository contains data and code used in the analysis of the RNA sequencin
 3. **STAR Alignment**
 4. **Generate Feature Counts Table**
 5. **Limma Analysis**
+- In the root project directory, create (if it doesn't exist), a folder named
+"artifacts". In this folder, place a copy of the following files: 
+    - gene_counts_corrected.tsv (This is the file generated from the STAR alignment and feature counts steps)
+    - genetype_lookup.txt (This is the file that we generated from the genome annotatios gtf file. We'll use this to filter out non-protein coding genes from our analysis and map gene ids to gene names)
+    - metadata.tsv (This contains the metadata, including the sample names, disease status, and age of the patients. This is used in the limma analysis when we control for sex later).
+- Run the following code to perform the Differential Gene Expression analysis:
+
+```bash
+Rscript deg/deg_analyses.R
+```
+
+- Note: we have commented out all the code for the analyses that we didn't use in our results in the interest of saving you time (It will take another 10-15 minutes if you choose to uncomment the other tests). If you want to run the other analyses too, simply uncomment the code for those analyses found at the very end of the script and run the script again.
+- If it succeeded, in the artifacts directory, there should be a lpm_protein_control_nothing/ and an lpm_protein_control_sex/ directory.
+- In those, you'll see the pvalue histogram and volcano plot (used in our paper). Additionally, you'll see the full results table order by FDR corrected pvalue. We will use the t statistic from the control sex results table as our ranking metric for the GSEA pathway analysis later on.
+- In the lpm_protein_control_nothing/ results significant File, you will find our two primary DEGs, which we used in the subsequent machine learning step.
 6. **TBSignatureProfiler**
 7. **ROC Pipeline**
 8. **GSEA Pathway Analysis**
