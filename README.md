@@ -13,7 +13,13 @@ This repository contains data and code used in the analysis of the RNA sequencin
     - gene_counts_corrected.tsv (This is the file generated from the STAR alignment and feature counts steps)
     - genetype_lookup.txt (This is the file that we generated from the genome annotatios gtf file. We'll use this to filter out non-protein coding genes from our analysis and map gene ids to gene names)
     - metadata.tsv (This contains the metadata, including the sample names, disease status, and age of the patients. This is used in the limma analysis when we control for sex later).
-- Run the following code to perform the Differential Gene Expression analysis:
+- cd into the deg folder with:
+
+```bash
+cd deg
+```
+
+- Run the following code in your shell to perform the Differential Gene Expression analysis:
 
 ```bash
 Rscript deg/deg_analyses.R
