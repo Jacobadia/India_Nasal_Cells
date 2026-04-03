@@ -93,7 +93,14 @@ Script to run:
 - `featureCounts.sh`
 
 5. **Limma Analysis**
-- Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.) and have R installed on your system. Specifically, Rscript should be on PATH.
+
+- Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.) and have R installed on your system. On Windows, add the R `bin` folder to your PATH by opening System Properties > Environment Variables > Path > Edit > New, then paste the folder path (for example, `C:\Program Files\R\R-4.x.x\bin`). Reopen your terminal and run `Rscript --version` to confirm it works.
+- After this, ensure that Rscript is on your PATH. You can check this by running:
+
+```bash
+Rscript --version
+```
+
 - Install the following R packages:
     - CRAN: ggplot2
     - Bioconductor: DESeq2, limma, edgeR
