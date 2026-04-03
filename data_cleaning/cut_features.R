@@ -1,4 +1,7 @@
-raw_gene_counts_file <- "../artifacts/gene_counts_corrected.tsv"
+args <- commandArgs(trailingOnly = TRUE)
+
+raw_gene_counts_file <- args[1]
+outfile_name <- args[2]
 
 counts <- read.delim(
     raw_gene_counts_file,
@@ -9,4 +12,4 @@ counts <- read.delim(
 
 counts <- counts[, 6:ncol(counts)]
 
-write.table(counts, "gene_counts_matrix_cut.txt", sep = "\t", quote = FALSE, row.names = TRUE)
+write.table(counts, outfile_name, sep = "\t", quote = FALSE, row.names = TRUE)
