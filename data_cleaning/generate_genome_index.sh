@@ -40,6 +40,12 @@ fi
 
 conda activate "${conda_environment}"
 
+# The mode is genomeGenerate because we want to generate the
+# genome index for STAR to use in the alignment step.
+# The annotations file is used to map positions to actual genes
+# The overhang is set to 150 because that is the max read length -1 in our samples
+# The STAR Documentation recommends setting this to max(read_length) - 1
+
 STAR \
 --runThreadN "${SLURM_CPUS_PER_TASK}" \
 --runMode genomeGenerate \

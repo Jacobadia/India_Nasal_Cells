@@ -72,6 +72,15 @@ genome_index_dir="/grphome/grp_tb/star_genome/index"
 max_locations_mapped_to=1
 max_mismatches_per_read=10
 
+# The index dir was generated previously and has the necessary file for STAR to run
+# Like the Suffix Array etc ...
+# The annotations_gtf is there to guide the alignment so we can maps read positions to
+# actual genes and get the gene counts.
+# The GeneCounts mode is set because we want to get the gene counts (See STAR manual
+# for details on this mode)
+# The outFilterMultimapNmax is set to 1 to only keep reads that map to a single location in the genome
+# The outFilterMismatchNmax is set to 10 to allow for some mismatches but not too many
+
 STAR \
 --genomeDir "$genome_index_dir" \
 --sjdbGTFfile "$annotations_gtf" \
