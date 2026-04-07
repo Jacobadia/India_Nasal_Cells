@@ -108,11 +108,11 @@ Rscript india_nasal_TBsignatureProfiler.R
 # 3. **ROC Pipeline**
 - Install R  and (optional R studio) https://posit.co/download/rstudio-desktop/
 - Open repository in Rstudio and **set working directory to folder "India_Nasal_Cells"** (go to the file tab in Rstudio click the gear icon and select "set as working directory") or when running R files in R script (command line) run from folder "India_Nasal_Cells"
-- All results will be saved as PDFs in the models folder
+    - All results will be saved as PDFs in the models folder
 - Run roc_models_figure2.R
 - Run roc_models_figure3.R
 - for external validation go to https://github.com/nisreenkhambati/uganda_nasal_cells/tree/main/data copy "nasalcoldata.csv" & "nasalcounts.csv" then paste into our /data folder
-- Run roc_models_figure4.R
+    - Run roc_models_figure4.R
 
 # 4. **GSEA Pathway Analysis**
 - Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.). The wget utility should be installed on your system and be on PATH. We will be using it to download the gene sets from the MSigDB database. You can check if you have wget installed by running:
