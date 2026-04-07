@@ -156,8 +156,8 @@ Purpose: To run a statistical analysis and find differentially expressed genes (
   ```
 
 - In the root project directory, create (if it doesn't exist), a folder named
-"artifacts". In this folder, place a copy of the following files: 
-    - gene_counts_corrected.tsv (This is the file generated from the STAR alignment and feature counts steps)
+"data". In this folder, there should be a copy of the following files: 
+    - gene_counts.tsv (This is the file generated from the STAR alignment and feature counts steps)
     - genetype_lookup.txt (This is the file that we generated from the genome annotatios gtf file. We'll use this to filter out non-protein coding genes from our analysis and map gene ids to gene names)
     - metadata.tsv (This contains the metadata, including the sample names, disease status, and age of the patients. This is used in the limma analysis when we control for sex later).
 - cd into the deg folder with:
@@ -173,7 +173,7 @@ Rscript deg_analyses.R
 ```
 
 - Note: we have commented out all the code for the analyses that we didn't use in our results in the interest of saving you time (It will take another 10-15 minutes if you choose to uncomment the other tests). If you want to run the other analyses too, simply uncomment the code for those analyses found at the very end of the script and run the script again.
-- If it succeeded, in the artifacts directory, there should be a lpm_protein_control_nothing/ and an lpm_protein_control_sex/ directory.
+- If it succeeded, in the data directory, there should be a lpm_protein_control_nothing/ and an lpm_protein_control_sex/ directory.
 - In those, you'll see the pvalue histogram and volcano plot (used in our paper). Additionally, you'll see the full results table order by FDR corrected pvalue. We will use the t statistic from the control sex results table as our ranking metric for the GSEA pathway analysis later on.
 - In the lpm_protein_control_nothing/ results significant File, you will find our two primary DEGs, which we used in the subsequent machine learning step.
 # 6. **TBSignatureProfiler**
@@ -219,6 +219,12 @@ pip install pandas matplotlib numpy
 
 ```bash
 cd pathways
+```
+
+- Run the following command to generate the .rnk file needed for the GSEA analysis.
+
+```bash
+python create_rnk.py
 ```
 
 - Run the following command to download the gene set files from msigdb.
