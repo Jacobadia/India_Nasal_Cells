@@ -1,46 +1,32 @@
-# Package Installation Script
-
-
-# Install BiocManager if needed
 options(repos = c(CRAN = "https://cloud.r-project.org"))
+
 if (!require("BiocManager", quietly = TRUE)) {
   install.packages("BiocManager")
 }
 
-# CRAN packages
-cran_packages <- c(
-  "tidyverse",
-  "ggplot2",
-  "caret",
-  "MLeval",
-  "patchwork",
-  "ranger",
-  "glmnet",
-  "kernlab",
-  "pls",
-  "pROC",
-  "recipes"
+# Install CRAN packages
+install.packages(
+  cran_packages <- c(
+    "tidyverse",
+    "ggplot2",
+    "caret",
+    "MLeval",
+    "patchwork",
+    "ranger",
+    "glmnet",
+    "kernlab",
+    "pls",
+    "pROC"
+  ),
+  dependencies = TRUE
 )
 
-# Install only missing ones
-for (pkg in cran_packages) {
-  if (!require(pkg, character.only = TRUE)) {
-    install.packages(pkg, dependencies = TRUE)
-    library(pkg, character.only = TRUE)
-  }
-}
-
-# Bioconductor packages
-bioc_packages <- c(
-  "DESeq2",
-  "sva"
+# Install Bioconductor packages
+BiocManager::install(
+  c("DESeq2","sva"),
+  ask = FALSE,
+  update = FALSE
 )
-
-for (pkg in bioc_packages) {
-  if (!(pkg %in% installed)) {
-    BiocManager::install(pkg, ask = FALSE, update = FALSE)
-  }
-}
 
 
 
@@ -183,7 +169,7 @@ stopifnot(all(colnames(counts_corrected) == rownames(col_data)))
 #                "TMEM156","SHC4","P2RY10","TBC1D22A-DT","CIB2"
 #)
 
-##top 50
+##top 50 from limma
 signatures <- c("MS4A1","PRRX2","TXLNGY","CAMK4","H2AC12",
                 "SPC24","PIK3R6","NOX1","MTNR1A","RPS4Y1",
                 "DDX3Y","EPOR","KDM5D","USP9Y","ASPM",
