@@ -1,3 +1,47 @@
+# Package Installation Script
+
+
+# Install BiocManager if needed
+if (!require("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+
+# CRAN packages
+cran_packages <- c(
+  "tidyverse",
+  "ggplot2",
+  "caret",
+  "MLeval",
+  "patchwork",
+  "ranger",
+  "glmnet",
+  "kernlab",
+  "pls",
+  "pROC"
+)
+
+# Install only missing ones
+installed <- rownames(installed.packages())
+for (pkg in cran_packages) {
+  if (!(pkg %in% installed)) {
+    install.packages(pkg, dependencies = TRUE)
+  }
+}
+
+# Bioconductor packages
+bioc_packages <- c(
+  "DESeq2",
+  "sva"
+)
+
+for (pkg in bioc_packages) {
+  if (!(pkg %in% installed)) {
+    BiocManager::install(pkg, ask = FALSE, update = FALSE)
+  }
+}
+
+
+
 library(tidyverse)
 library(DESeq2)
 library(caret)
