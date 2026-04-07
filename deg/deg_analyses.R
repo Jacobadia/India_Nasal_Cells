@@ -1,3 +1,12 @@
+# UNCOMMENT THIS TO INSTALL DEPEDENCIES
+# options(repos = c(CRAN = "https://cloud.r-project.org"))
+# if (!requireNamespace("BiocManager", quietly = TRUE)) {
+#     install.packages("BiocManager")
+# }
+
+# install.packages("ggplot2")
+# BiocManager::install(c("DESeq2", "limma", "edgeR"))
+
 source("./parse_counts.R")
 source("./filtration.R")
 source("./differential.R")
