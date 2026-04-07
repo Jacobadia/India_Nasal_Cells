@@ -9,15 +9,15 @@ import matplotlib as mpl
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
-OUTPUT_PATH = "../pathway_artifacts/gsea_publication_figure.png"
+OUTPUT_PATH = "../data/pathways/gsea_publication_figure.png"
 
 GSEA_DIRS = (
-    "../pathway_artifacts/Hallmark_ranked_sex_GSEA",
-    "../pathway_artifacts/KEGG_Legacy_ranked_sex_GSEA",
-    "../pathway_artifacts/Reactome_ranked_sex_GSEA",
-    "../pathway_artifacts/ImmuneSigDB_ranked_sex_GSEA",
-    "../pathway_artifacts/KEGG_Medicus_ranked_sex_GSEA",
-    "../pathway_artifacts/Vax_ranked_sex_GSEA",
+    "../data/pathways/Hallmark_ranked_sex_GSEA",
+    "../data/pathways/KEGG_Legacy_ranked_sex_GSEA",
+    "../data/pathways/Reactome_ranked_sex_GSEA",
+    # "../data/pathways/ImmuneSigDB_ranked_sex_GSEA",
+    # "../data/pathways/KEGG_Medicus_ranked_sex_GSEA",
+    # "../data/pathways/Vax_ranked_sex_GSEA",
 )
 
 def find_gsea_reports(gsea_dirs):

@@ -10,7 +10,7 @@ set -euo pipefail
 MSIGDB_RELEASE="2026.1.Hs"
 
 # Output folder for downloaded GMT files.
-OUT_DIR="../pathway_artifacts/msigdb"
+OUT_DIR="../data/pathways/msigdb"
 
 # Base URL for downloadable MSigDB release files.
 BASE_URL="https://data.broadinstitute.org/gsea-msigdb/msigdb/release"

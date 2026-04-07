@@ -4,9 +4,10 @@ import sys
 sys.path.insert(0, str(Path(__file__).parent))
 from name_mapper import GeneNameMapper
 
-INPUT_PATH = "../artifacts/lpm_protein_control_sex/deg_results_full.txt"
-OUTPUT_PATH = "../pathway_artifacts/lpm_protein_control_sex.rnk"
+INPUT_PATH = "../data/lpm_protein_control_sex/deg_results_full.txt"
+OUTPUT_PATH = "../data/pathways/lpm_protein_control_sex.rnk"
 
+Path(OUTPUT_PATH).parent.mkdir(parents=True, exist_ok=True)
 
 def map_and_filter_genes(df, mapper):
 	mapped = []

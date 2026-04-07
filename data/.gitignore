@@ -1,2 +1,6 @@
 # ignore these results folders
 lpm*
+# this has the gene set files
+msigdb/
+pathways/*_GSEA/
+pathways/*.png
