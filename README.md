@@ -184,7 +184,9 @@ Rscript deg_analyses.R
     - Documentation can be found here: https://wejlab.github.io/TBSignatureProfiler-docs/
 - While working in the `TBSignatureProfiler` directory, run the `india_nasal_TBsignatureProfiler.R` file with the command:
 
-    `Rscript india_nasal_TBsignatureProfiler.R`
+```bash
+Rscript india_nasal_TBsignatureProfiler.R
+```
 
 - There is a set of install commands at the top of the R file that are not necessary if the following dependencies are fulfilled: `tidyverse`, `ggplot2`, `readr`, `cowplot`,`HGNChelper`, `pROC`, `TBSignatureProfiler`, `sva`, `SummarizedExperiment`
 
