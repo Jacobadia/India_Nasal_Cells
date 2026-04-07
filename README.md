@@ -2,43 +2,8 @@
 This repository contains data and code used in the analysis of the RNA sequencing nasal Indian data
 
 Initial notes:
-This code primarily utilizes bash, Python, R, and slurm scripts to run the pipeline. Ensure that you have a python, R IDE to utilize the code and generate figures.
 
-Slurm scripts can be run using `sbatch [NAME_OF_SCRIPT]` in the terminal. When to use slurm will be indicated in the directions below.
-
-Most slurm parameters (indicated at the top as `#SBATCH`) is optimized for the task. Ensure that the pathways for
-
-`#SBATCH --output=`
-`#SBATCH --error=`
-
-are correct for your setup.
-
-All input and output directories, except for your initial `INPUT_DIR` has already been created in the `DATA` folder. Packages were installed using Conda (installation information found here: https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) and the Bioconductor installer (using this command `conda install bioconda::PACKAGE_NAME'). Conda packages not found in Bioconductor were installed using 'conda install PACKAGE_NAME' command in the terminal.
-
------
-
-`CONDA_ENV` can be found by using the following command:
-
-```bash
-conda info --base | awk '{print $1 "/etc/profile.d/conda.sh"}'
-```
-other common locations:
-- Miniconda (Default): ~/miniconda3/etc/profile.d/conda.sh
-- Anaconda (Default): ~/anaconda3/etc/profile.d/conda.sh
-- macOS Homebrew: /usr/local/Caskroom/miniconda/base/etc/profile.d/conda.sh
-- Linux (System-wide): /opt/anaconda3/etc/profile.d/conda.sh
-
-Please note to activate the Conda environment you install the package(s) in at the conda initialization steps (shown as 'conda activate [NAME OF ENVIRONMENT]') in each file.
-
-------
-
-Conda Packages you will need to run this portion:
-- fastqc
-- multiqc
-- fastp
-- STAR
-- samtools
-- subread
+If there are any questions regarding how the data was processed to generate the gene counts table, please refer to the `Raw_Data_Processing` `README.md` file.
 
 R packages you will need to run this portion:
 - limma
