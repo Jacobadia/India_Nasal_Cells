@@ -4,8 +4,8 @@ source("./differential.R")
 source("./create_pvalue_histogram.R")
 source("./create_volcano_plot.R")
 
-artifacts_dir <- "../artifacts/"
-matrix_counts_file <- paste0(artifacts_dir, "gene_counts_corrected.tsv")
+artifacts_dir <- "../data/"
+matrix_counts_file <- paste0(artifacts_dir, "gene_counts.tsv")
 metadata_file <- paste0(artifacts_dir, "metadata.tsv")
 gene_type_file <- paste0(artifacts_dir, "genetype_lookup.txt")
 hemoglobin_file <- paste0(artifacts_dir, "hemoglobin_genes.tsv")
