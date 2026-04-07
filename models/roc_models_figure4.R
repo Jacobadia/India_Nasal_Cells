@@ -2,17 +2,13 @@ library(tidyverse)
 library(DESeq2)
 library(caret)
 library(ggplot2)
-library(doParallel)
-library(devEMF)
 library(MLeval)
 library(sva)
 library(patchwork)
-library(cowplot)
 library(ranger)
 library(glmnet)
 library(kernlab)
 library(pls)
-library(readr)
 library(pROC)
 
 
@@ -180,7 +176,7 @@ if (length(valid_genes) == 0) {
 #### Modelling dataframe ####
 u_counts_data <- read.csv("data/nasalcounts.csv", header=TRUE, row.names = 1)
 u_coldata <- read.csv("data/nasalcoldata.csv", header=TRUE, row.names = 1)
-u_coldata <- coldata %>%
+u_coldata <- u_coldata %>%
   dplyr::mutate(
     status = factor(status, levels = c("control", "case")),
     sex = factor(sex, levels = c("male", "female")))
@@ -218,13 +214,13 @@ all(colnames(vst_mat) == rownames(u_coldata))
 
 
 sig_genes_present <- intersect(valid_genes, rownames(vst_mat))
-if(length(sig_genes_present) < length(sig_genes)) {
+if(length(sig_genes_present) < length(valid_genes)) {
   warning("Some sig_genes not found in VST = matrix")
 }
 
 feats <- t(vst_mat[sig_genes_present, , drop = FALSE]) %>% as.data.frame()
 head(feats)
-feats$status <- factor(coldata[rownames(coldata), "status"])
+feats$status <- factor(u_coldata[rownames(u_coldata), "status"])
 colnames(feats)
 head(feats)
 stopifnot(!anyNA(feats$status))
