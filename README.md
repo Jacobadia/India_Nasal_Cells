@@ -144,9 +144,11 @@ Purpose: To run a statistical analysis and find differentially expressed genes (
     - CRAN: ggplot2
     - Bioconductor: DESeq2, limma, edgeR
 
-  If you need to install them, use:
+  If you need to install them, simply uncomment these
+  lines in deg_analyses.R and run the script. You can comment them out again after you have the packages installed to save time in future runs.:
 
   ```r
+  options("repos" = c(CRAN = "http://cran.r-project.org"))
   if (!requireNamespace("BiocManager", quietly = TRUE)) {
       install.packages("BiocManager")
   }
@@ -193,14 +195,28 @@ Rscript deg_analyses.R
 wget --version
 ```
 
+If you don't have wget installed, you can install it using your system's package manager.
+
+For windows, if your using chocolatey (if not then get it).
+
+```bash
+choco install wget
+```
+
+For MacOS in your using homebrew (if not then get it).
+
+```bash
+brew install wget
+``` 
+
 - Ensure that Java in installed on your system and that the version is 21 or later. You can check your Java version by running:
 
 ```bash
 java -version
 ```
 
-- Ensure that you have the GSEA software (invoked via the CLI) on your system. you can download it from the Msigdb website here: https://www.gsea-msigdb.org/gsea/downloads.jsp. It may prompt you to input your email. Choose the version:
-    - GSEA v4.4.0 for the command line (all platforms)
+- Ensure that you have the GSEA software (invoked via the CLI) on your system. you can download it from the Msigdb website here: https://www.gsea-msigdb.org/gsea/downloads.jsp. It may prompt you to input your email. Choose the CORRECT version:
+    - **GSEA v4.4.0 for the command line (all platforms)**
 - Unzip the GSEA distibution. It should look something like this.
 ![IMG](reproduce_utils/gsea_dist.png)
 - In the unzipped GSEA distribution, there should be a file called "gsea-cli.sh". This file is VERY IMPORTANT. save the ABSOLUTE PATH to this file. We will use it to invoke the GSEA software from the command line.
@@ -223,7 +239,8 @@ pip install pandas matplotlib numpy
 ```
 
 - Now we can run the analysis.
-- cd into the pathways directory with:
+- Ensure that you are in the root directory of the project in your terminal. You should see folders like DATA, deg, R, etc. when you run `ls` or `dir` in the terminal.
+- Then, cd into the pathways directory with:
 
 ```bash
 cd pathways
