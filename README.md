@@ -144,9 +144,11 @@ Purpose: To run a statistical analysis and find differentially expressed genes (
     - CRAN: ggplot2
     - Bioconductor: DESeq2, limma, edgeR
 
-  If you need to install them, use:
+  If you need to install them, simply uncomment these
+  lines in deg_analyses.R and run the script. You can comment them out again after you have the packages installed to save time in future runs.:
 
   ```r
+  options("repos" = c(CRAN = "http://cran.r-project.org"))
   if (!requireNamespace("BiocManager", quietly = TRUE)) {
       install.packages("BiocManager")
   }
