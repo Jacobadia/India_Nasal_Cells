@@ -1,6 +1,6 @@
 library(ggplot2)
 
-create_pvalue_histogram <- function(plot_dir, deg_results_file, artifacts_dir = "../artifacts/") {
+create_pvalue_histogram <- function(plot_dir, deg_results_file, artifacts_dir = "../data/") {
 
   print(paste("Creating p-value histogram for:", deg_results_file))
   # Load the full DEG results
@@ -22,5 +22,5 @@ create_pvalue_histogram <- function(plot_dir, deg_results_file, artifacts_dir = 
       plot.background = element_rect(fill = "white", color = NA)
     )
     
-  ggsave(output_histogram_file, width = 8, height = 6, plot = histogram_plot)
+  ggsave(output_histogram_file, width = 8, height = 6, plot = histogram_plot, create.dir = TRUE)
 }

@@ -5,7 +5,7 @@ metadata_file <- "../artifacts/metadata.tsv"
 gene_type_file <- "../artifacts/genetype_lookup.txt"
 
 output_plot_name <- "gene_counts_histogram"
-output_histogram_file <- paste0("../artifacts/", output_plot_name, ".png")
+output_histogram_file <- paste0("../data/", output_plot_name, ".png")
 
 
 # Load the gene counts data
@@ -71,4 +71,4 @@ histogram_plot <- ggplot(data.frame(average_counts), aes(x = average_counts)) +
     panel.background = element_rect(fill = "white", color = NA),
     plot.background = element_rect(fill = "white", color = NA)
   )
-ggsave(output_histogram_file, width = 8, height = 6, plot = histogram_plot)
+ggsave(output_histogram_file, width = 8, height = 6, plot = histogram_plot, create.dir = TRUE)

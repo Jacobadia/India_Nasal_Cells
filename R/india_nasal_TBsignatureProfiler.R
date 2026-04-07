@@ -1,20 +1,11 @@
 library(tidyverse)
-library(DESeq2)
-library(caret)
 library(ggplot2)
 library(TBSignatureProfiler)
-library(doParallel)
-library(devEMF)
-library(MLeval)
 library(sva)
-library(patchwork)
-library(cowplot)
-library(ranger)
-library(glmnet)
-library(kernlab)
-library(pls)
 library(readr)
 library(SummarizedExperiment)
+library(cowplot)
+
 
 #"PRRX2"
 #"MS4A1"
@@ -23,13 +14,13 @@ library(SummarizedExperiment)
 
 set.seed(42)
 gene_types = read_tsv(
-  "R/genetype_lookup.txt",
+  "../data/genetype_lookup.txt",
   col_names = c("Geneid", "name", "type")
 )
 
-gene_counts_raw = read_tsv("R/gene_counts_corrected.tsv")
+gene_counts_raw = read_tsv("../data/gene_counts.tsv")
 
-metadata = read_tsv("R/metadata.tsv") 
+metadata = read_tsv("../data/metadata.tsv") 
 
 metadata = metadata %>% mutate(sample = `Nasal ID`)
 
@@ -40,8 +31,8 @@ gene_counts <- gene_counts_raw %>%
 gene_counts = left_join(gene_counts_raw, gene_types)
 
 gene_counts = gene_counts %>%
-  #  filter(!startsWith(name, "ENSG")) %>%
-  select(-c(Chr,Start,End,Strand,Length)) %>%
+#   #  filter(!startsWith(name, "ENSG")) %>%
+#   select(-c(Chr,Start,End,Strand,Length)) %>%
   select(name, everything()) 
 
 # Collapse duplicate gene names
@@ -113,14 +104,8 @@ ssgsea_result <- runTBsigProfiler(input = india_tb,
 
 
 cd <- as.data.frame(colData(ssgsea_result))
+good_sigs = colnames(cd[5:82])
 
-good_sigs <- signature_names[
-  sapply(cd[, signature_names, drop = FALSE], is.numeric) &
-    apply(cd[, signature_names, drop = FALSE], 2, function(z) length(unique(z)) > 1) &
-    colSums(is.na(cd[, signature_names, drop = FALSE])) == 0
-]
-
-good_sigs = good_sigs[-1]
 booted <- bootstrapAUC(SE_scored = ssgsea_result, annotationColName = "status",
                        signatureColNames = good_sigs, num.boot = 30)
 boot_auc <- as.data.frame(booted$`Boot AUC Values`)
@@ -134,7 +119,7 @@ boot_results <- tibble(
   p_value     = booted$`P-values`
 )
 
-readr::write_csv(boot_results, "bootstrapAUC_results_india_nasal.csv")
+readr::write_csv(boot_results, "../data/bootstrapAUC_results_india_nasal.csv")
 significant_signatures = boot_results %>% 
     filter(p_value <= 0.05) %>%
     pull(signature) %>%
@@ -169,4 +154,4 @@ plot = ggplot(boot_results, aes(signature, neg_log_p)) +
   ylab("Negative Log P-value") + 
   labs(color = "P value below 0.05", title = "P-Value Significance of Signatures from TBsignatureProfiler") 
   
-ggsave2("bootstrap_results.pdf", plot = plot, width = 8, height = 10)
+ggsave2("../data/bootstrap_results.pdf", plot = plot, width = 8, height = 10)
