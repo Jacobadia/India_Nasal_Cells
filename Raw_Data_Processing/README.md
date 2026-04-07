@@ -1,7 +1,5 @@
 # India_Nasal_Cells FastQ Processing Supplementary Info
 
-
-
 ## Initial notes:
 
 This code is not meant to be run as the original data is not in the repository. The folder organization required to run this code is shown below in the directory tree below. The purpose of this information is provided to answer any questions about initial data processing prior to the generation of the gene counts table.
@@ -79,7 +77,7 @@ Other Variable(s):
 `SAMPLE_LIST` should look something like this:  
   
 
-<img src="sample_arrays_ids_image.png" width="30%">
+<img src="sample_array_ids_image.png" width="50%">
 
 
 Script to run:
