@@ -21,6 +21,8 @@ create_pvalue_histogram <- function(plot_dir, deg_results_file, artifacts_dir = 
       panel.background = element_rect(fill = "white", color = NA),
       plot.background = element_rect(fill = "white", color = NA)
     )
+
+    print(paste("saving to:", output_histogram_file))
     
-  ggsave(output_histogram_file, width = 8, height = 6, plot = histogram_plot, create.dir = TRUE)
+  ggsave(output_histogram_file, width = 8, height = 6, plot = histogram_plot)
 }
