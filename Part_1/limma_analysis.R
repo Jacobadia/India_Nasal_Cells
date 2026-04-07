@@ -6,13 +6,13 @@ library(DESeq2)
 library(sva)
 library(org.Hs.eg.db)
 
-setwd("India_Nasal_cells/data")
+setwd("/India_Nasal_Cells/data")
 
 # Read and format the featureCounts table properly
 counts <- read_tsv("gene_counts.tsv")
 column_to_rownames("Geneid")
 
-setwd("India_Nasal_cells/Part_1")
+setwd("India_Nasal_Cells/Part_1")
 
 # counts <- counts %>%
 #   dplyr::select(-Chr, -Start, -End, -Strand, -Length) %>%
