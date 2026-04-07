@@ -18,7 +18,8 @@ cran_packages <- c(
   "glmnet",
   "kernlab",
   "pls",
-  "pROC"
+  "pROC",
+  "recipes"
 )
 
 # Install only missing ones
