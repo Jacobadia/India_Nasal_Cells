@@ -51,92 +51,7 @@ R packages you will need to run this portion:
 
 # Code (In Order)
 
-# 1. **Pre-Trim Quality Control** (Slurm)
-
-Purpose: To initial check the quality of the RNAseq data to see if trimming is necessary. If data is clean, adapter content needs to be removed and most indicators on the multiqc report should be green on the left hand side of the report.
-
-Package(s) needed:
-- fastqc
-- multiqc
-
-Variable(s) to adjust:
-- CONDA_ENV *pathway to your conda environment source folder*
-- HOME_DIR *pathway to the base home directory* 
-- INPUT_DIR *insert pathway to fastq files; found in DATA folder in git*
-
-Other Variable(s):
-- OUTPUT_DIR *destination fastqc folder*
-- SAMPLE_LIST *the file with the array of sample IDs in the DATA folder*
-
-Script to run:
-- `initial_check.sh`
-- `run_multiqc.sh` (no slurm needed)
-
-# 2. **Trimming and Post-Trim Quality Control** (Slurm)
-
-Purpose: To trim and improve the quality of our reads, then running another check to see if the data passes most indicators in the multiqc report.
-
-Package(s) needed:
-- fastp
-- fastqc
-- multiqc
-
-Variable(s) to adjust:
-- CONDA_ENV *pathway to your conda environment source folder*
-- HOME_DIR *pathway to the base home directory*
-
-Other Variable(s):
-- INPUT_DIR *pathway to fastq files; found in DATA folder in git*
-- OUTPUT_DIR *destination folder for trimmed fastq files*
-- OUTPUT_DIR2 *destination folder for fastqc folders*
-- SAMPLE_LIST *the file with the array of sample IDs in the DATA folder*
-
-Script to run:
-- `trim_N_check.sh`
-- `run_multiqc2.sh` (no slurm needed)
-
-# 3. **STAR Alignment** (Slurm)
-
-Purpose: Aligning RNAseq reads to the human genome to find which genes are associated with which sequences of RNA. We then convert the output (SAM files) to BAM files in preparation to get a gene count table.
-
-Package(s) needed:
-- STAR
-- samtools
-
-Variable(s) to adjust:
-- CONDA_ENV *pathway to your conda environment source folder*
-- DATA_DIR *input directory of trimmed fastq files*
-- OUTPUT_DIR *finalized bam files output from STAR aligner and samtools conversion*
-
-Other Variable(s):
-- SAMPLE_LIST *alternative sample list found in the DATA folder*
-- genome_index_dir *genome index files, provided in DATA folder*
-- annotations_gtf *annotations files found in DATA folder*
-- temp_dir *temporary directory for files in case something gets corrupted, is removed at the end of project*
-
-Script to run:
-- `alignment_alt.sh`
-
-# 4. **Generate Feature Counts Table**
-
-Purpose: Counting all of the gene using the featureCounts package and generating a gene counts table to use in our analysis.
-
-Package(s) needed:
-- subread
-
-Variable(s) to adjust:
-- CONDA_ENV *pathway to your conda environment source folder*
-- GTF *annotation folder provided in DATA folder*
-
-Other Variable(s):
-- INPUT_DIR *input directory of BAM files from alignment_alt.sh output*
-- OUTPUT_DIR *output directory for the feature counts table needed for DEG analysis*
-- LOG_DIR *directory for error log files*
-
-Script to run:
-- `featureCounts.sh`
-
-# 5. **Limma Analysis** 
+# 1. **Limma Analysis** 
 Purpose: To run a statistical analysis and find differentially expressed genes (DEGs) as potential indicators for TB.
 
 - Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.) and have R installed on your system. Specifically, Rscript should be on PATH.
@@ -178,17 +93,28 @@ Rscript deg_analyses.R
 - If it succeeded, in the data directory, there should be a lpm_protein_control_nothing/ and an lpm_protein_control_sex/ directory.
 - In those, you'll see the pvalue histogram and volcano plot (used in our paper). Additionally, you'll see the full results table order by FDR corrected pvalue. We will use the t statistic from the control sex results table as our ranking metric for the GSEA pathway analysis later on.
 - In the lpm_protein_control_nothing/ results significant File, you will find our two primary DEGs, which we used in the subsequent machine learning step.
-# 6. **TBSignatureProfiler**
-# 7. **ROC Pipeline**
+
+# 2. **TBSignatureProfiler**
+- TBSignature Profiler is a bioconductor package that evaluates a variety of previously published Tuberculosis signatures on our dataset
+    - Documentation can be found here: https://wejlab.github.io/TBSignatureProfiler-docs/
+- While working in the `TBSignatureProfiler` directory, run the `india_nasal_TBsignatureProfiler.R` file with the command:
+
+```bash
+Rscript india_nasal_TBsignatureProfiler.R
+```
+
+- There is a set of install commands at the top of the R file that are not necessary if the following dependencies are fulfilled: `tidyverse`, `ggplot2`, `readr`, `cowplot`,`HGNChelper`, `pROC`, `TBSignatureProfiler`, `sva`, `SummarizedExperiment`
+
+# 3. **ROC Pipeline**
 - Install R  and (optional R studio) https://posit.co/download/rstudio-desktop/
 - Open repository in Rstudio and **set working directory to folder "India_Nasal_Cells"** (go to the file tab in Rstudio click the gear icon and select "set as working directory") or when running R files in R script (command line) run from folder "India_Nasal_Cells"
-- All results will be saved as PDFs in the models folder
+    - All results will be saved as PDFs in the models folder
 - Run roc_models_figure2.R
 - Run roc_models_figure3.R
 - for external validation go to https://github.com/nisreenkhambati/uganda_nasal_cells/tree/main/data copy "nasalcoldata.csv" & "nasalcounts.csv" then paste into our /data folder
-- Run roc_models_figure4.R
+    - Run roc_models_figure4.R
 
-# 8. **GSEA Pathway Analysis**
+# 4. **GSEA Pathway Analysis**
 - Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.). The wget utility should be installed on your system and be on PATH. We will be using it to download the gene sets from the MSigDB database. You can check if you have wget installed by running:
 
 ```bash
@@ -295,5 +221,3 @@ python create_gsea_figure.py
 ```
 
 - There should now be a figure called gsea_publication_figure.png in the data/pathways directory. This is the figure that we used in our paper.
-
-9. **Figure Creation**
