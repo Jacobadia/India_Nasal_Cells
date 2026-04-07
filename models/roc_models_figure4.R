@@ -35,18 +35,18 @@ theme_SL2 <- function() {
 
 ### Load Data
 gene_types <- read_tsv(
-  "R/genetype_lookup.txt",
+  "data/genetype_lookup.txt",
   col_names = c("Geneid", "name", "type"),
   show_col_types = FALSE
 )
 
 gene_counts_raw <- read_tsv(
-  "R/gene_counts_corrected.tsv",
+  "data/gene_counts.tsv",
   show_col_types = FALSE
 )
 
 metadata <- read_tsv(
-  "R/metadata.tsv",
+  "data/metadata.tsv",
   show_col_types = FALSE
 ) %>%
   mutate(sample = `Nasal ID`)
@@ -67,11 +67,6 @@ gene_counts <- gene_counts %>%
   ) %>%
   rename_with(~ gsub("\\.", "-", .x), -name)
 
-# Remove rows where gene name is still an Ensembl ID; drop genomic coordinate cols
-gene_counts <- gene_counts %>%
-  # filter(!startsWith(name, "ENSG")) %>%
-  select(-c(Geneid, Chr, Start, End, Strand, Length)) %>%
-  select(name, everything())
 
 # Collapse duplicate gene names by summing counts
 gene_counts <- gene_counts %>%
@@ -428,6 +423,6 @@ roc_pls  <- make_roc_plot_test(pls_fit,    test_data, "PLS")
 roc_grid <- (roc_rf | roc_enet | roc_svmr) /
   (roc_svml | roc_knn | roc_pls)
 
-ggsave("roc_plots_figure_4.pdf", plot = roc_grid, width = 12, height = 8)
+ggsave("models/roc_plots_figure_4.pdf", plot = roc_grid, width = 12, height = 8)
 
 roc_grid
