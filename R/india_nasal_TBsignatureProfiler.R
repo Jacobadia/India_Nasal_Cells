@@ -1,3 +1,22 @@
+## ONLY UNCOMMENT IF INSTALLATION NECESSARY ##
+# # Install CRAN helper if needed
+# if (!require("BiocManager", quietly = TRUE)) {
+#   install.packages("BiocManager")
+# }
+# 
+# # Install CRAN packages
+# install.packages(
+#   c("tidyverse", "ggplot2", "readr", "cowplot"),
+#   dependencies = TRUE
+# )
+# 
+# # Install Bioconductor packages
+# BiocManager::install(
+#   c("TBSignatureProfiler", "sva", "SummarizedExperiment"),
+#   ask = FALSE,
+#   update = FALSE
+# )
+
 library(tidyverse)
 library(ggplot2)
 library(TBSignatureProfiler)
@@ -31,8 +50,6 @@ gene_counts <- gene_counts_raw %>%
 gene_counts = left_join(gene_counts_raw, gene_types)
 
 gene_counts = gene_counts %>%
-#   #  filter(!startsWith(name, "ENSG")) %>%
-#   select(-c(Chr,Start,End,Strand,Length)) %>%
   select(name, everything()) 
 
 # Collapse duplicate gene names
@@ -47,7 +64,6 @@ counts_data <- gene_counts %>%
   as.matrix()
 
 ### Prepare metadata
-
 col_data <- metadata %>%
   select(sample, Age, Sex) %>%
   mutate(status = str_sub(sample, -1) == "A") %>%
@@ -80,7 +96,6 @@ counts_corrected <- ComBat_seq(
 
 counts_corrected <- as.data.frame(counts_corrected)
 counts_corrected$name <- rownames(counts_corrected)
-# [1] "Nasal ID" "Age" "Sex" "sample"  # or maybe only the first 3
 counts_corrected <- counts_corrected[, colnames(counts_corrected) != "name", drop = FALSE]
 
 counts_corrected[] <- lapply(counts_corrected, as.numeric)
