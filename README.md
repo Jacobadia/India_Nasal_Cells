@@ -279,7 +279,7 @@ chmod u+x <shell_script_name>.sh
 ./download_gene_sets.sh
 ```
 
-- There should now be a folder pathway_artifacts/msigdb containing all the gene set files that we will use in our analysis.
+- There should now be a folder data/pathways/msigdb containing all the gene set files that we will use in our analysis.
 
 - run the following command to run the GSEA analysis:
     - Note, this should take like 10 minutes if your computer is slow like mine
@@ -294,6 +294,6 @@ chmod u+x <shell_script_name>.sh
 python create_gsea_figure.py
 ```
 
-- There should now be a figure called gsea_publication_figure.png in the pathway_artifacts directory. This is the figure that we used in our paper.
+- There should now be a figure called gsea_publication_figure.png in the data/pathways directory. This is the figure that we used in our paper.
 
 9. **Figure Creation**
