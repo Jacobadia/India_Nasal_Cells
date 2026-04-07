@@ -237,9 +237,9 @@ DO NOT CHOOSE THE ONE SPECIFIC TO A PLATFORM. CHOOSE THIS ONE:
 # -----------------------------
 
 GSEA_EXEC_PATH="/path/to/gsea-cli.sh" # EDIT THIS. put your absolute path to the gsea-cli.sh file here.
-RANKED_FILE="" # dont edit this
-GENESET_FILE="" # dont edit this
-OUT_DIR="" # dont edit this
+RANKED_FILE="" # DONT edit this
+GENESET_FILE="" # DONT edit this
+OUT_DIR="" # DONT edit this
 ```
 
 - Ensure that python is installed an on PATH. Ensure that the following python packages are installed:
