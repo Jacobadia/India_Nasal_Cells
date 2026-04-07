@@ -137,17 +137,17 @@ stopifnot(all(colnames(counts_corrected) == rownames(col_data)))
 #                "TMEM156","SHC4","P2RY10","TBC1D22A-DT","CIB2"
 #)
 
+##top 50
 signatures <- c("MS4A1","PRRX2","TXLNGY","CAMK4","H2AC12",
-               "SPC24","PIK3R6","NOX1","MTNR1A","RPS4Y1",
-               "DDX3Y","EPOR","KDM5D","USP9Y","ASPM",
-               "PTPN20","ZFP57","NLGN4Y","GPR27","SLC26A4-AS1",
-               "PREX2","GPR68","ZFY","C3orf70","ZNF683",
-               "CPED1","RHBDL3","NCAPG","XIST","GPR143","ESCO2",
-               "PRKY","TTTY14","LINC00278","AKAP5","ENSG00000300770",
-               "CLCNKA","ENSG00000307688","H2BC14","PLCL1",
-               "UTY","SAA1","SGO1","PADI2","SYT8","GCSAM","HENMT1",
-               "ICOS","ENSG00000294508","EIF1AY","TLR10",
-               "SAA2", "FCRL5","ATP6AP1-DT","NLRP2","XK"
+                "SPC24","PIK3R6","NOX1","MTNR1A","RPS4Y1",
+                "DDX3Y","EPOR","KDM5D","USP9Y","ASPM",
+                "PTPN20","ZFP57","NLGN4Y","GPR27","SLC26A4-AS1",
+                "PREX2","GPR68","ZFY","C3orf70","ZNF683",
+                "CPED1","RHBDL3","NCAPG","XIST","GPR143",
+                "ESCO2","PRKY","TTTY14","LINC00278","AKAP5",
+                "ENSG00000300770","CLCNKA","ENSG00000307688","H2BC14","PLCL1",
+                "UTY","SAA1","SGO1","PADI2","SYT8",
+                "GCSAM","HENMT1","ICOS","ENSG00000294508","EIF1AY"
 )
 
 # NIS 4-gene signature
