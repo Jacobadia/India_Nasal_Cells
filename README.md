@@ -178,7 +178,16 @@ Rscript deg_analyses.R
 - If it succeeded, in the data directory, there should be a lpm_protein_control_nothing/ and an lpm_protein_control_sex/ directory.
 - In those, you'll see the pvalue histogram and volcano plot (used in our paper). Additionally, you'll see the full results table order by FDR corrected pvalue. We will use the t statistic from the control sex results table as our ranking metric for the GSEA pathway analysis later on.
 - In the lpm_protein_control_nothing/ results significant File, you will find our two primary DEGs, which we used in the subsequent machine learning step.
+
 # 6. **TBSignatureProfiler**
+- TBSignature Profiler is a bioconductor package that evaluates a variety of previously published Tuberculosis signatures on our dataset
+    - Documentation can be found here: https://wejlab.github.io/TBSignatureProfiler-docs/
+- While working in the `TBSignatureProfiler` directory, run the `india_nasal_TBsignatureProfiler.R` file with the command:
+
+    `Rscript india_nasal_TBsignatureProfiler.R`
+
+- There is a set of install commands at the top of the R file that are not necessary if the following dependencies are fulfilled: `tidyverse`, `ggplot2`, `readr`, `cowplot`,`HGNChelper`, `pROC`, `TBSignatureProfiler`, `sva`, `SummarizedExperiment`
+
 # 7. **ROC Pipeline**
 - Install R  and (optional R studio) https://posit.co/download/rstudio-desktop/
 - Open repository in Rstudio and **set working directory to folder "India_Nasal_Cells"** (go to the file tab in Rstudio click the gear icon and select "set as working directory") or when running R files in R script (command line) run from folder "India_Nasal_Cells"
