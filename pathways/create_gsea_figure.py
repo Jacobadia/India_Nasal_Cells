@@ -130,7 +130,7 @@ def get_dot_size_legend_handles():
 def main():
     table_data = collect_gsea_tables(GSEA_DIRS)
     n_panels = len(table_data)
-    fig, axes, nrows, ncols = setup_figure(n_panels, ncols=1, nrows=6, figsize=(10, 40))
+    fig, axes, nrows, ncols = setup_figure(n_panels, ncols=1, nrows=3, figsize=(10, 40))
     upreg_palette = {"Active": "#1f77b4", "Latent": "#d62728"}
     nes_lim = get_global_nes_limits(table_data)
 
