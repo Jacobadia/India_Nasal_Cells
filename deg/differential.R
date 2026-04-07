@@ -1,10 +1,3 @@
-# options(repos = c(CRAN = "https://cloud.r-project.org"))
-
-# if (!requireNamespace("BiocManager", quietly = TRUE))
-#     install.packages("BiocManager")
-
-# BiocManager::install(c("DESeq2", "limma", "edgeR"), update = FALSE, ask = FALSE)
-
 suppressMessages(suppressWarnings(library(DESeq2)))
 suppressMessages(suppressWarnings(library(limma)))
 suppressMessages(suppressWarnings(library(edgeR)))

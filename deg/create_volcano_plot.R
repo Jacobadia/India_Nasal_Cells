@@ -1,6 +1,6 @@
 library(ggplot2)
 
-create_volcano_plot <- function(plot_dir, deg_results_file, artifacts_dir = "../artifacts/") {
+create_volcano_plot <- function(plot_dir, deg_results_file, artifacts_dir = "../data/") {
   print(paste("Creating volcano plot for:", deg_results_file))
 
   output_volcano_file <- paste0(artifacts_dir, plot_dir, "/volcano_plot.png")

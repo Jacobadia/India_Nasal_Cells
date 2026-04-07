@@ -1,11 +1,20 @@
+# UNCOMMENT THIS TO INSTALL DEPEDENCIES
+# options(repos = c(CRAN = "https://cloud.r-project.org"))
+# if (!requireNamespace("BiocManager", quietly = TRUE)) {
+#     install.packages("BiocManager")
+# }
+
+# install.packages("ggplot2")
+# BiocManager::install(c("DESeq2", "limma", "edgeR"))
+
 source("./parse_counts.R")
 source("./filtration.R")
 source("./differential.R")
 source("./create_pvalue_histogram.R")
 source("./create_volcano_plot.R")
 
-artifacts_dir <- "../artifacts/"
-matrix_counts_file <- paste0(artifacts_dir, "gene_counts_corrected.tsv")
+artifacts_dir <- "../data/"
+matrix_counts_file <- paste0(artifacts_dir, "gene_counts.tsv")
 metadata_file <- paste0(artifacts_dir, "metadata.tsv")
 gene_type_file <- paste0(artifacts_dir, "genetype_lookup.txt")
 hemoglobin_file <- paste0(artifacts_dir, "hemoglobin_genes.tsv")
@@ -21,8 +30,8 @@ create_test_func <- function(matrix_counts_file, metadata_file, gene_type_file, 
         conditionData <- get_condition_data(counts, metadata_file)
         deg_function(counts, conditionData, 
         full_deg_results_file, significant_deg_results_file)
-        create_pvalue_histogram(dir_name, full_deg_results_file)
-        create_volcano_plot(dir_name, full_deg_results_file)
+        create_pvalue_histogram(dir_name, full_deg_results_file, artifacts_dir)
+        create_volcano_plot(dir_name, full_deg_results_file, artifacts_dir)
     })
 }
 
@@ -249,23 +258,23 @@ lpm_protein_mean_100_control_age_and_sex <- create_test_func(matrix_counts_file,
 # protein_mean_100_control_age()
 # protein_mean_100_control_age_and_sex()
 
-lpm_pure_no_control()
-lpm_pure_control_sex()
-lpm_pure_control_age()
-lpm_pure_control_age_and_sex()
+# lpm_pure_no_control()
+# lpm_pure_control_sex()
+# lpm_pure_control_age()
+# lpm_pure_control_age_and_sex()
 lpm_protein_control_nothing()
 lpm_protein_control_sex()
-lpm_protein_control_age()
-lpm_protein_control_age_and_sex()
-lpm_protein_hemoglobin_control_nothing()
-lpm_protein_hemoglobin_control_sex()
-lpm_protein_hemoglobin_control_age()
-lpm_protein_hemoglobin_control_age_and_sex()
-lpm_protein_mean_10_control_nothing()
-lpm_protein_mean_10_control_sex()
-lpm_protein_mean_10_control_age()
-lpm_protein_mean_10_control_age_and_sex()
-lpm_protein_mean_100_control_nothing()
-lpm_protein_mean_100_control_sex()
-lpm_protein_mean_100_control_age()
-lpm_protein_mean_100_control_age_and_sex()
+# lpm_protein_control_age()
+# lpm_protein_control_age_and_sex()
+# lpm_protein_hemoglobin_control_nothing()
+# lpm_protein_hemoglobin_control_sex()
+# lpm_protein_hemoglobin_control_age()
+# lpm_protein_hemoglobin_control_age_and_sex()
+# lpm_protein_mean_10_control_nothing()
+# lpm_protein_mean_10_control_sex()
+# lpm_protein_mean_10_control_age()
+# lpm_protein_mean_10_control_age_and_sex()
+# lpm_protein_mean_100_control_nothing()
+# lpm_protein_mean_100_control_sex()
+# lpm_protein_mean_100_control_age()
+# lpm_protein_mean_100_control_age_and_sex()

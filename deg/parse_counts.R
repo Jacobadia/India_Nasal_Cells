@@ -6,8 +6,6 @@ get_counts_data <- function(matrix_counts_file) {
     comment.char = "#",
     check.names = FALSE
   )
-
-  counts <- counts[, 6:ncol(counts)]
   return (counts)
 }
 

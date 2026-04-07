@@ -7,7 +7,7 @@ class MappingEntry:
 
 class GeneNameMapper:
 
-    default_mapping_file = "../artifacts/genetype_lookup.txt"
+    default_mapping_file = "../data/genetype_lookup.txt"
 
     def __init__(self, mapping_file: str = default_mapping_file):
         self.mapping: dict[str, MappingEntry] = self.load_mapping(mapping_file)
