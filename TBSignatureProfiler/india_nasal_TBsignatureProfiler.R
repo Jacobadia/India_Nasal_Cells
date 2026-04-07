@@ -1,21 +1,23 @@
-## ONLY UNCOMMENT IF INSTALLATION NECESSARY ##
-# # Install CRAN helper if needed
-# if (!require("BiocManager", quietly = TRUE)) {
-#   install.packages("BiocManager")
-# }
-# 
-# # Install CRAN packages
-# install.packages(
-#   c("tidyverse", "ggplot2", "readr", "cowplot"),
-#   dependencies = TRUE
-# )
-# 
-# # Install Bioconductor packages
-# BiocManager::install(
-#   c("TBSignatureProfiler", "sva", "SummarizedExperiment"),
-#   ask = FALSE,
-#   update = FALSE
-# )
+# ONLY UNCOMMENT IF INSTALLATION NECESSARY ##
+# Install CRAN helper if needed
+options(repos = c(CRAN = "https://cloud.r-project.org"))
+
+if (!require("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+
+# Install CRAN packages
+install.packages(
+  c("tidyverse", "ggplot2", "readr", "cowplot", "HGNChelper", "pROC"),
+  dependencies = TRUE
+)
+
+# Install Bioconductor packages
+BiocManager::install(
+  c("TBSignatureProfiler", "sva", "SummarizedExperiment"),
+  ask = FALSE,
+  update = FALSE
+)
 
 library(tidyverse)
 library(ggplot2)
@@ -160,7 +162,7 @@ plot = ggplot(boot_results, aes(signature, neg_log_p)) +
   ) +
   theme_bw() +
   theme(
-    axis.text.x  = element_blank(),  
+    axis.text.x  = element_blank(),
     axis.ticks.x = element_blank(),
     panel.grid.major.x = element_blank(),
     panel.grid.minor.x = element_blank()
