@@ -4,3 +4,5 @@ lpm*
 msigdb/
 pathways/*_GSEA/
 pathways/*.png
+nasalcoldata.csv
+nasalcounts.csv
