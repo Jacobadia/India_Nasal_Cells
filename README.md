@@ -215,16 +215,31 @@ brew install wget
 java -version
 ```
 
+**VERY IMPORTANT**: The pathway analysis will NOT work if you are using a version of Java that is older than 21. If you have an older version of Java, you will need to uninstall it and install Java 21 or later. The GSEA software requires Java 21 or later to run, and using an older version will result in errors when you try to run the pathway analysis.
+
+If you don't have Java installed, you can download it from the official Oracle website: https://www.oracle.com/java/technologies/downloads/. Make sure to download Java SE Development Kit (JDK) version 21 or later. Make sure that its on path after installation. You can run the java -version command again after installation to confirm that it is correctly installed and on PATH.
+
+**NOTE**: after adjusting PATH or installing new software, it is often necessary to restart your terminal for the changes to take effect. If you find that after installing Java or wget, you are still getting errors that they are not found, try closing and reopening your terminal and running the commands again.
+
 - Ensure that you have the GSEA software (invoked via the CLI) on your system. you can download it from the Msigdb website here: https://www.gsea-msigdb.org/gsea/downloads.jsp. It may prompt you to input your email. Choose the CORRECT version:
+DO NOT CHOOSE THE ONE SPECIFIC TO A PLATFORM. CHOOSE THIS ONE:
     - **GSEA v4.4.0 for the command line (all platforms)**
 - Unzip the GSEA distibution. It should look something like this.
 ![IMG](reproduce_utils/gsea_dist.png)
 - In the unzipped GSEA distribution, there should be a file called "gsea-cli.sh". This file is VERY IMPORTANT. save the ABSOLUTE PATH to this file. We will use it to invoke the GSEA software from the command line.
 
-- In the pathways/gsea_analysis_ranked.sh, there is a variable at the top called GSEA_EXEC_PATH. Set this variable to the absolute path of the gsea-cli.sh file that we just talked about. It should look something like this:
+- In the pathways/gsea_analysis_ranked.sh, there is a variable at the top called GSEA_EXEC_PATH. **Set this variable to the absolute path** of the gsea-cli.sh file that we just talked about. It should look something like this:
 
 ```bash
-GSEA_EXEC_PATH="/path/to/gsea-cli.sh"
+# -----------------------------
+# GSEA PRERANKED RUN CONFIGURATION
+# Edit these values before each run.
+# -----------------------------
+
+GSEA_EXEC_PATH="/path/to/gsea-cli.sh" # EDIT THIS. put your absolute path to the gsea-cli.sh file here.
+RANKED_FILE="" # dont edit this
+GENESET_FILE="" # dont edit this
+OUT_DIR="" # dont edit this
 ```
 
 - Ensure that python is installed an on PATH. Ensure that the following python packages are installed:
@@ -250,6 +265,12 @@ cd pathways
 
 ```bash
 python create_rnk.py
+```
+
+NOTE: You must ensure that these shell scripts have execute permissions for your own user (ie file owner) on your machine. This can be done with the following command:
+
+```bash
+chmod u+x <shell_script_name>.sh
 ```
 
 - Run the following command to download the gene set files from msigdb.
