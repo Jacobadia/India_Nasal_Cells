@@ -34,18 +34,18 @@ theme_SL2 <- function() {
 
 ### Load Data
 gene_types <- read_tsv(
-  "R/genetype_lookup.txt",
+  "data/genetype_lookup.txt",
   col_names = c("Geneid", "name", "type"),
   show_col_types = FALSE
 )
 
 gene_counts_raw <- read_tsv(
-  "R/gene_counts_corrected.tsv",
+  "data/gene_counts_corrected.tsv",
   show_col_types = FALSE
 )
 
 metadata <- read_tsv(
-  "R/metadata.tsv",
+  "data/metadata.tsv",
   show_col_types = FALSE
 ) %>%
   mutate(sample = `Nasal ID`)
