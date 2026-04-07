@@ -22,10 +22,10 @@ cran_packages <- c(
 )
 
 # Install only missing ones
-installed <- rownames(installed.packages())
 for (pkg in cran_packages) {
-  if (!(pkg %in% installed)) {
+  if (!require(pkg, character.only = TRUE)) {
     install.packages(pkg, dependencies = TRUE)
+    library(pkg, character.only = TRUE)
   }
 }
 
