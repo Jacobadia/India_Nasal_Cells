@@ -71,6 +71,21 @@ conda activate star_aligner
 
 echo "### Running STAR alignment ###"
 
+# The index dir is the directory containing the STAR genome index files, it
+# has things necessary for the alignment. like the suffix array etc ...
+# runThreadN is the number of threads to use, we set this to be the number
+# of cores requested in the SBATCH parameters.
+# quantMode GeneCounts tells STAR to count the number of reads mapping to each gene
+# outFilterMultimapNmax 1 tells STAR to only keep reads that map to a
+# single location in the genome (i.e. unique mappers)
+# readFilesIn are the two paired read files for this sample.
+# Remember that SLURM is executing this asynchronously across all our
+# samples.
+# We use zcat to read the gzipped fastq files directly without needing to unzip them first.
+# we output the alignment in a BAM format, and we use
+# sam tools to convert it to the correct file format this is critical for
+# getting our featureCounts table later on.
+
 STAR \
   --genomeDir "$genome_index_dir" \
   --sjdbGTFfile "$annotations_gtf" \
