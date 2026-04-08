@@ -80,6 +80,7 @@ Rscript india_nasal_TBsignatureProfiler.R
 - ALL roc R scripts are run from the **ROOT PROJECT DIRECTORY**
     - Open repository in Rstudio and **set working directory to folder "India_Nasal_Cells"** (go to the file tab in Rstudio click the gear icon and select "set as working directory") or when running R files in R script (command line) run from folder "India_Nasal_Cells"
         - All results will be saved as PDFs in the models folder
+- There is a set of install commands at the top of the R file that are not necessary if the following dependencies are fulfilled: `tidyverse`, `ggplot2`, `caret`, `MLeval`, `patchwork`, `ranger`, `glmnet`, `kernlab`, `pls`, `pROC`, `DESeq2`,`sva`
 - Run `Rscript models/roc_models_figure2.R`
 - Run `Rscript models/roc_models_figure3.R`
 - for external validation go to https://github.com/nisreenkhambati/uganda_nasal_cells/tree/main/data copy "nasalcoldata.csv" & "nasalcounts.csv" then paste into our /data folder
