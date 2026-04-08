@@ -19,6 +19,7 @@ R packages you will need to run this portion:
 # 1. **Limma Analysis** 
 Purpose: To run a statistical analysis and find differentially expressed genes (DEGs) as potential indicators for TB.
 
+- START in the **ROOT PROJECT DIRECTORY**
 - Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.) and have R installed on your system. Specifically, Rscript should be on PATH.
 - Install the following R packages:
     - CRAN: ggplot2
@@ -47,6 +48,8 @@ Purpose: To run a statistical analysis and find differentially expressed genes (
 ```bash
 cd deg
 ```
+
+- you should now be in [project root]/deg
 
 - Run the following code in your shell to perform the Differential Gene Expression analysis:
 
@@ -80,6 +83,9 @@ Rscript india_nasal_TBsignatureProfiler.R
     - Run roc_models_figure4.R
 
 # 4. **GSEA Pathway Analysis**
+
+- Again begin this in the **ROOT PROJECT DIRECTORY**
+
 - Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.). The wget utility should be installed on your system and be on PATH. We will be using it to download the gene sets from the MSigDB database. You can check if you have wget installed by running:
 
 ```bash
@@ -145,7 +151,8 @@ pip install pandas matplotlib numpy
 ```
 
 - Now we can run the analysis.
-- Ensure that you are in the root directory of the project in your terminal. You should see folders like DATA, deg, R, etc. when you run `ls` or `dir` in the terminal.
+- Ensure that you are in the root directory of the project in your terminal. You should see folders like DATA, deg, R, etc. when you run `ls` or `dir` in the terminal.\
+
 - Then, cd into the pathways directory with:
 
 ```bash
