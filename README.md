@@ -21,12 +21,14 @@ Purpose: To run a statistical analysis and find differentially expressed genes (
 
 - START in the **ROOT PROJECT DIRECTORY**
 - Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.) and have R installed on your system. Specifically, Rscript should be on PATH.
+    -  To verify R Installation Run the following in your terminal
+        -  `R --version` & `Rscript --version`
 - Install the following R packages:
     - CRAN: ggplot2
     - Bioconductor: DESeq2, limma, edgeR
 
   If you need to install them, simply uncomment these
-  lines in deg_analyses.R and run the script. You can comment them out again after you have the packages installed to save time in future runs.:
+  lines in `deg/deg_analyses.R` and run the script. You can comment them out again after you have the packages installed to save time in future runs.:
 
   ```r
   options("repos" = c(CRAN = "http://cran.r-project.org"))
@@ -75,12 +77,13 @@ Rscript india_nasal_TBsignatureProfiler.R
 
 # 3. **ROC Pipeline**
 - Install R  and (optional R studio) https://posit.co/download/rstudio-desktop/
-- Open repository in Rstudio and **set working directory to folder "India_Nasal_Cells"** (go to the file tab in Rstudio click the gear icon and select "set as working directory") or when running R files in R script (command line) run from folder "India_Nasal_Cells"
-    - All results will be saved as PDFs in the models folder
-- Run roc_models_figure2.R
-- Run roc_models_figure3.R
+- ALL roc R scripts are run from the **ROOT PROJECT DIRECTORY**
+    - Open repository in Rstudio and **set working directory to folder "India_Nasal_Cells"** (go to the file tab in Rstudio click the gear icon and select "set as working directory") or when running R files in R script (command line) run from folder "India_Nasal_Cells"
+        - All results will be saved as PDFs in the models folder
+- Run `Rscript models/roc_models_figure2.R`
+- Run `Rscript models/roc_models_figure3.R`
 - for external validation go to https://github.com/nisreenkhambati/uganda_nasal_cells/tree/main/data copy "nasalcoldata.csv" & "nasalcounts.csv" then paste into our /data folder
-    - Run roc_models_figure4.R
+    - Run `Rscript models/roc_models_figure4.R`
 
 # 4. **GSEA Pathway Analysis**
 
