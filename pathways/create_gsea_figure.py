@@ -11,6 +11,16 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 OUTPUT_PATH = "../data/pathways/gsea_publication_figure.png"
 
+# Output scale presets to avoid huge raster dimensions.
+FIGURE_SCALE_PRESET = "screen"  # options: compact, screen, print
+SCALE_PRESETS = {
+    "compact": {"dpi": 120, "panel_height": 2.4, "width": 9.0},
+    "screen": {"dpi": 180, "panel_height": 4.5, "width": 10.0},
+    "print": {"dpi": 240, "panel_height": 3.2, "width": 10.5},
+}
+MIN_FIG_HEIGHT = 6.0
+MAX_FIG_HEIGHT = 18.0
+
 GSEA_DIRS = (
     "../data/pathways/Hallmark_ranked_sex_GSEA",
     "../data/pathways/KEGG_Legacy_ranked_sex_GSEA",
@@ -76,6 +86,20 @@ def setup_figure(n_panels, ncols, nrows, figsize):
     plt.subplots_adjust(wspace=0.5, hspace=0.6)  # more vertical space
     return fig, axes, nrows, ncols
 
+
+def get_figure_settings(n_panels, ncols=1, scale_preset=FIGURE_SCALE_PRESET):
+    if scale_preset not in SCALE_PRESETS:
+        raise ValueError(
+            f"Unknown FIGURE_SCALE_PRESET '{scale_preset}'. "
+            f"Choose one of: {', '.join(SCALE_PRESETS.keys())}"
+        )
+
+    preset = SCALE_PRESETS[scale_preset]
+    nrows = int(np.ceil(n_panels / ncols))
+    fig_height = float(np.clip(nrows * preset["panel_height"], MIN_FIG_HEIGHT, MAX_FIG_HEIGHT))
+    figsize = (preset["width"], fig_height)
+    return nrows, figsize, preset["dpi"]
+
 def get_global_nes_limits(table_data):
     all_nes = pd.concat([df["NES"] for _, df in table_data])
     nes_min = all_nes.min()
@@ -130,7 +154,9 @@ def get_dot_size_legend_handles():
 def main():
     table_data = collect_gsea_tables(GSEA_DIRS)
     n_panels = len(table_data)
-    fig, axes, nrows, ncols = setup_figure(n_panels, ncols=1, nrows=3, figsize=(10, 40))
+    ncols = 1
+    nrows, figsize, dpi = get_figure_settings(n_panels, ncols=ncols)
+    fig, axes, nrows, ncols = setup_figure(n_panels, ncols=ncols, nrows=nrows, figsize=figsize)
     upreg_palette = {"Active": "#1f77b4", "Latent": "#d62728"}
     nes_lim = get_global_nes_limits(table_data)
 
@@ -187,7 +213,7 @@ def main():
     fig.suptitle("GSEA Results: Top Pathways per Database", fontsize=18, y=0.99)
     # Reserve even more space at the top for legends
     plt.tight_layout(rect=[0, 0, 0.97, 0.95])
-    plt.savefig(OUTPUT_PATH, dpi=300)
+    plt.savefig(OUTPUT_PATH, dpi=dpi)
     print(f"Saved GSEA figure to {OUTPUT_PATH}")
 
 if __name__ == "__main__":
