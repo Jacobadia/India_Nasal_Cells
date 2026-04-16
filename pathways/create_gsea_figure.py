@@ -74,7 +74,7 @@ def collect_gsea_tables(gsea_dirs):
         top10 = top10.sort_values('FDR q-val', ascending=True)
         # Use original FDR q-val values for full precision
         # Add 'Upregulated in' column
-        upreg = top10['NES'].apply(lambda x: 'Active' if x > 0 else 'Latent')
+        upreg = top10['NES'].apply(lambda x: 'TB Disease' if x > 0 else 'TB Infection')
         top10 = top10.assign(**{'Upregulated in': upreg})
         # Only keep NAME, FDR q-val, NES, Upregulated in
         top10 = top10[['NAME', 'FDR q-val', 'NES', 'Upregulated in']]
@@ -157,7 +157,7 @@ def main():
     ncols = 1
     nrows, figsize, dpi = get_figure_settings(n_panels, ncols=ncols)
     fig, axes, nrows, ncols = setup_figure(n_panels, ncols=ncols, nrows=nrows, figsize=figsize)
-    upreg_palette = {"Active": "#1f77b4", "Latent": "#d62728"}
+    upreg_palette = {"TB Disease": "#1f77b4", "TB Infection": "#d62728"}
     nes_lim = get_global_nes_limits(table_data)
 
     for idx, (dbname, df) in enumerate(table_data):
