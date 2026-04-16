@@ -25,7 +25,7 @@ create_volcano_plot <- function(plot_dir, deg_results_file, artifacts_dir = "../
   line_in_range <- is.finite(y_max) && (threshold_y <= y_max)
 
   volcano_plot <- ggplot(deg_results, aes(x = logFC, y = neg_log10_padj, color = significant)) +
-    geom_point(alpha = 0.5, size = 1) +
+    geom_point(alpha = 1.0, size = 1) +
     scale_color_manual(values = c("FALSE" = "grey60", "TRUE" = "firebrick"),
                        labels = c("FALSE" = "Not significant (padj \u2265 0.05)", "TRUE" = "Significant (padj < 0.05)"),
                        name = "Significance",
