@@ -124,16 +124,16 @@ stopifnot(all(colnames(counts_data) == rownames(col_data)))
 
 ### Batch Correction (ComBat_seq, correcting for Sex)
 
-# batch         <- factor(col_data$Sex)
-# sample_group  <- factor(col_data$status)
-# 
-# counts_corrected <- ComBat_seq(
-#   counts = counts_data,
-#   batch  = batch,
-#   group  = sample_group
-# )
+batch         <- factor(col_data$Sex)
+sample_group  <- factor(col_data$status)
 
-counts_corrected <- counts_data
+counts_corrected <- ComBat_seq(
+  counts = counts_data,
+  batch  = batch,
+  group  = sample_group
+)
+
+#counts_corrected <- counts_data
 
 stopifnot(all(colnames(counts_corrected) == rownames(col_data)))
 
@@ -143,7 +143,7 @@ stopifnot(all(colnames(counts_corrected) == rownames(col_data)))
 # signatures <- c("RNU6-289P","RN7SKP270","FAM90A11","RNU6ATAC36P","HAVCR1P1", "ENSG00000278215")
 
 #top 2 genes identified by Lima
-#signatures <-  c("ENSG00000156738", "ENSG00000167157")
+signatures <-  c("ENSG00000156738", "ENSG00000167157")
 
 #top 100 from limma
 #signatures <- c("MS4A1","PRRX2","TXLNGY","CAMK4","H2AC12",
@@ -170,17 +170,19 @@ stopifnot(all(colnames(counts_corrected) == rownames(col_data)))
 #)
 
 ##top 50 from limma
-signatures <- c("MS4A1","PRRX2","TXLNGY","CAMK4","H2AC12",
-                "SPC24","PIK3R6","NOX1","MTNR1A","RPS4Y1",
-                "DDX3Y","EPOR","KDM5D","USP9Y","ASPM",
-                "PTPN20","ZFP57","NLGN4Y","GPR27","SLC26A4-AS1",
-                "PREX2","GPR68","ZFY","C3orf70","ZNF683",
-                "CPED1","RHBDL3","NCAPG","XIST","GPR143",
-                "ESCO2","PRKY","TTTY14","LINC00278","AKAP5",
-                "ENSG00000300770","CLCNKA","ENSG00000307688","H2BC14","PLCL1",
-                "UTY","SAA1","SGO1","PADI2","SYT8",
-                "GCSAM","HENMT1","ICOS","ENSG00000294508","EIF1AY"
-)
+# signatures <- c("MS4A1","PRRX2","TXLNGY","CAMK4","H2AC12",
+#                 "SPC24","PIK3R6","NOX1","MTNR1A","RPS4Y1",
+#                 "DDX3Y","EPOR","KDM5D","USP9Y","ASPM",
+#                 "PTPN20","ZFP57","NLGN4Y","GPR27","SLC26A4-AS1",
+#                 "PREX2","GPR68","ZFY","C3orf70","ZNF683",
+#                 "CPED1","RHBDL3","NCAPG","XIST","GPR143",
+#                 "ESCO2","PRKY","TTTY14","LINC00278","AKAP5",
+#                 "ENSG00000300770","CLCNKA","ENSG00000307688","H2BC14","PLCL1",
+#                 "UTY","SAA1","SGO1","PADI2","SYT8",
+#                 "GCSAM","HENMT1","ICOS","ENSG00000294508","EIF1AY"
+# )
+
+# signatures <- c("MS4A1","GPR27","PRRX2","EPOR","LINC00278","ZFY")
 
 # NIS 4-gene signature
 # signatures <- c("SPIB", "SHISA2", "TESPA1", "CD1B")
@@ -370,6 +372,88 @@ roc_pls     <- make_roc_plot(pls_fit,     "PLS")
 roc_grid <- (roc_rf | roc_enet | roc_svmr) /
   (roc_svml | roc_knn | roc_pls)
 
-ggsave("models/roc_plots_figure_2.pdf", plot = roc_grid, width = 12, height = 8)
+ggsave("models/roc_plots_figure_A2.pdf", plot = roc_grid, width = 12, height = 8)
 
 roc_grid
+
+#### importance of genes
+# 
+# importance_knn <- varImp(knn_fit)
+# importance_svmr <- varImp(svmr_fit)
+# importance_svml <- varImp(svm_fit)
+# importance_pls <- varImp(pls_fit)
+# importance_glm <- varImp(glmnet_fit)
+# importance_rf <- varImp(r_fit)
+# 
+# plot_importance <- function(fit, model_name, top = 10) {
+#   imp <- varImp(fit)
+#   ggplot(imp, top = top) +
+#     theme_SL2() +
+#     ggtitle(paste("Top", top, "Genes by Importance in", model_name, "Model (Nasal)")) +
+#     xlab("Genes") +
+#     ylab("Variable Importance") +
+#     theme(axis.text.x = element_text(size = 16, angle = 45, hjust = 1))
+# }
+# 
+# nasal_rf    <- plot_importance(r_fit,       "Random Forest")
+# nasal_knn   <- plot_importance(knn_fit,     "kNN")
+# nasal_svmr  <- plot_importance(svmr_fit,    "SVM (Radial)")
+# nasal_svml  <- plot_importance(svm_fit,     "SVM (Linear)")
+# nasal_glm   <- plot_importance(glmnet_fit,  "Elastic Net")
+# nasal_pls   <- plot_importance(pls_fit,     "PLS")
+# 
+# nasal_rf
+# nasal_knn
+# nasal_svmr
+# nasal_svml
+# nasal_glm
+# nasal_pls
+# 
+# importance_rf_df <- as.data.frame(importance_rf$importance)
+# sorted_importance_rf_df <- importance_rf_df[order(importance_rf_df$Overall,
+#                                                   decreasing = TRUE), , drop = FALSE]
+# 
+# 
+# importance_knn_df <- as.data.frame(importance_knn$importance)
+# sorted_importance_knn_df <- importance_knn_df[order(importance_knn_df$control,
+#                                                     decreasing = TRUE), , drop = FALSE]
+# 
+# 
+# importance_pls_df <- as.data.frame(importance_pls$importance)
+# sorted_importance_pls_df <- importance_pls_df[order(importance_pls_df$Overall,
+#                                                     decreasing = TRUE), , drop = FALSE]
+# 
+# 
+# importance_glm_df <- as.data.frame(importance_glm$importance)
+# sorted_importance_glm_df <- importance_glm_df[order(importance_glm_df$Overall,
+#                                                     decreasing = TRUE), , drop = FALSE]
+# 
+# importance_svml_df <- as.data.frame(importance_svml$importance)
+# sorted_importance_svml_df <- importance_svml_df[order(importance_svml_df[[1]],
+#                                                     decreasing = TRUE), , drop = FALSE]
+# 
+# 
+# importance_svmr_df <- as.data.frame(importance_svmr$importance)
+# sorted_importance_svmr_df <- importance_svmr_df[order(importance_svmr_df[[1]],
+#                                                     decreasing = TRUE), , drop = FALSE]
+
+
+# which overlap between machine learning methods ####
+# top 10 important
+# top_predictive_genes_knn <- rownames(sorted_importance_knn_df)[1:30]
+# top_predictive_genes_rf <- rownames(sorted_importance_rf_df)[1:30]
+# top_predictive_genes_pls <- rownames(sorted_importance_pls_df)[1:30]
+# top_predictive_genes_glm <- rownames(sorted_importance_glm_df)[1:30]
+# top_predictive_genes_svml <- rownames(sorted_importance_svml_df)[1:30]
+# top_predictive_genes_svmr <- rownames(sorted_importance_svmr_df)[1:30]
+# 
+# overlapping_genes_ml <- Reduce(intersect, list(
+#   top_predictive_genes_knn,
+#   top_predictive_genes_rf,
+#   top_predictive_genes_pls,
+#   top_predictive_genes_glm,
+#   top_predictive_genes_svmr,
+#   top_predictive_genes_svml
+#   
+# ))
+# overlapping_genes_ml

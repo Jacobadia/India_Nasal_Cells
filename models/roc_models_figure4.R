@@ -92,16 +92,16 @@ stopifnot(all(colnames(counts_data) == rownames(col_data)))
 
 ### Batch Correction (ComBat_seq, correcting for Sex)
 
-# batch         <- factor(col_data$Sex)
-# sample_group  <- factor(col_data$status)
-# 
-# counts_corrected <- ComBat_seq(
-#   counts = counts_data,
-#   batch  = batch,
-#   group  = sample_group
-# )
+batch         <- factor(col_data$Sex)
+sample_group  <- factor(col_data$status)
 
-counts_corrected <- counts_data
+counts_corrected <- ComBat_seq(
+  counts = counts_data,
+  batch  = batch,
+  group  = sample_group
+)
+
+# counts_corrected <- counts_data
 
 stopifnot(all(colnames(counts_corrected) == rownames(col_data)))
 
@@ -111,7 +111,7 @@ stopifnot(all(colnames(counts_corrected) == rownames(col_data)))
 # signatures <- c("RNU6-289P","RN7SKP270","FAM90A11","RNU6ATAC36P","HAVCR1P1", "ENSG00000278215")
 
 #top 2 genes identified by Lima
-#signatures <-  c("ENSG00000156738", "ENSG00000167157")
+signatures <-  c("ENSG00000156738", "ENSG00000167157")
 
 #top 100 from limma
 # signatures <- c("MS4A1","PRRX2","TXLNGY","CAMK4","H2AC12",
@@ -138,17 +138,24 @@ stopifnot(all(colnames(counts_corrected) == rownames(col_data)))
 # )
 
 ##top 50
-signatures <- c("MS4A1","PRRX2","TXLNGY","CAMK4","H2AC12",
-                "SPC24","PIK3R6","NOX1","MTNR1A","RPS4Y1",
-                "DDX3Y","EPOR","KDM5D","USP9Y","ASPM",
-                "PTPN20","ZFP57","NLGN4Y","GPR27","SLC26A4-AS1",
-                "PREX2","GPR68","ZFY","C3orf70","ZNF683",
-                "CPED1","RHBDL3","NCAPG","XIST","GPR143",
-                "ESCO2","PRKY","TTTY14","LINC00278","AKAP5",
-                "ENSG00000300770","CLCNKA","ENSG00000307688","H2BC14","PLCL1",
-                "UTY","SAA1","SGO1","PADI2","SYT8",
-                "GCSAM","HENMT1","ICOS","ENSG00000294508","EIF1AY"
-)
+# signatures <- c("MS4A1","PRRX2","TXLNGY","CAMK4","H2AC12",
+#                 "SPC24","PIK3R6","NOX1","MTNR1A","RPS4Y1",
+#                 "DDX3Y","EPOR","KDM5D","USP9Y","ASPM",
+#                 "PTPN20","ZFP57","NLGN4Y","GPR27","SLC26A4-AS1",
+#                 "PREX2","GPR68","ZFY","C3orf70","ZNF683",
+#                 "CPED1","RHBDL3","NCAPG","XIST","GPR143",
+#                 "ESCO2","PRKY","TTTY14","LINC00278","AKAP5",
+#                 "ENSG00000300770","CLCNKA","ENSG00000307688","H2BC14","PLCL1",
+#                 "UTY","SAA1","SGO1","PADI2","SYT8",
+#                 "GCSAM","HENMT1","ICOS","ENSG00000294508","EIF1AY"
+# )
+
+#signatures <- c("MS4A1","GPR27","PRRX2","EPOR","LINC00278","ZFY")
+
+# signatures <- c("MS4A1", "GPR27","KDM5D","DDX3Y",
+#                 "TXLNGY","PRRX2","EPOR","NOX1",
+#                 "LINC00278","PLCL1","UTY","PRKY",
+#                 "SPC24","RPS4Y1","ZFY","NLGN4Y","EIF1AY")
 
 # NIS 4-gene signature
 # signatures <- c("SPIB", "SHISA2", "TESPA1", "CD1B")
@@ -419,6 +426,6 @@ roc_pls  <- make_roc_plot_test(pls_fit,    test_data, "PLS")
 roc_grid <- (roc_rf | roc_enet | roc_svmr) /
   (roc_svml | roc_knn | roc_pls)
 
-ggsave("models/roc_plots_figure_4.pdf", plot = roc_grid, width = 12, height = 8)
+ggsave("models/roc_plots_figure_6_external.pdf", plot = roc_grid, width = 12, height = 8)
 
 roc_grid
