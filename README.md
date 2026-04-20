@@ -21,12 +21,29 @@ Purpose: To run a statistical analysis and find differentially expressed genes (
 
 - START in the **ROOT PROJECT DIRECTORY**
 - Ensure that you are running a POSIX compliant shell (e.g. bash, zsh, etc.) and have R installed on your system. Specifically, Rscript should be on PATH.
+    -  To verify R Installation Run the following in your terminal
+        -  `R --version` & `Rscript --version`
+
+- If you know that you have R installed but dont know how to put it on PATH (ie. can be invoked via the CLI), here's a quick guide. You will need to locate your R installation directory. Note that we want the directory that contains the Rscript executable.
+
+- If inside that bin folder, there is an x64 folder that also contains the Rscript and R executables, use that x64 folder as the PATH instead of the parent bin folder. This is because the x64 folder contains the 64-bit version of R, which is what we want to use for our analysis.
+
+1. **Windows**: If you installed R using the default settings, it should be located in `C:\Program Files\R\R-x.x.x\bin` (where x.x.x is the version number). You can add this directory to your PATH environment variable by following these steps:
+    - Open the Start menu and search for "Environment Variables".
+    - Click on "Edit the system environment variables".
+    - In the System Properties window, click on the "Environment Variables" button.
+    - In the Environment Variables window, under "System variables", find and select the "Path" variable, then click "Edit".
+    - Click "New" and add the path to the R bin directory (e.g., `C:\Program Files\R\R-x.x.x\bin`).
+    - Click "OK" to close all windows.
+
+2. **MacOS/Linux/ OR POSIX Shell on Any Platform**: If you installed R using a package manager (like Homebrew on MacOS or apt on Linux), it should already be on your PATH. You can verify this by running `which R` in your terminal, which should return the path to the R executable. If it doesn't, you may need to add it to your PATH manually by editing your shell profile file (e.g., `~/.bash_profile`, `~/.zshrc`, etc.) and adding a line like `export PATH="/path/to/R/bin:$PATH"`.
+
 - Install the following R packages:
     - CRAN: ggplot2
     - Bioconductor: DESeq2, limma, edgeR
 
   If you need to install them, simply uncomment these
-  lines in deg_analyses.R and run the script. You can comment them out again after you have the packages installed to save time in future runs.:
+  lines in `deg/deg_analyses.R` and run the script. You can comment them out again after you have the packages installed to save time in future runs.:
 
   ```r
   options("repos" = c(CRAN = "http://cran.r-project.org"))
@@ -75,12 +92,14 @@ Rscript india_nasal_TBsignatureProfiler.R
 
 # 3. **ROC Pipeline**
 - Install R  and (optional R studio) https://posit.co/download/rstudio-desktop/
-- Open repository in Rstudio and **set working directory to folder "India_Nasal_Cells"** (go to the file tab in Rstudio click the gear icon and select "set as working directory") or when running R files in R script (command line) run from folder "India_Nasal_Cells"
-    - All results will be saved as PDFs in the models folder
-- Run roc_models_figure2.R
-- Run roc_models_figure3.R
+- ALL roc R scripts are run from the **ROOT PROJECT DIRECTORY**
+    - Open repository in Rstudio and **set working directory to folder "India_Nasal_Cells"** (go to the file tab in Rstudio click the gear icon and select "set as working directory") or when running R files in R script (command line) run from folder "India_Nasal_Cells"
+- All results will be **saved as PDFs** in the `models` folder
+- There is a set of install commands at the top of the R file that are not necessary if the following dependencies are fulfilled: `tidyverse`, `ggplot2`, `caret`, `MLeval`, `patchwork`, `ranger`, `glmnet`, `kernlab`, `pls`, `pROC`, `DESeq2`,`sva`
+- Run `Rscript models/roc_models_figure2.R`
+- Run `Rscript models/roc_models_figure3.R`
 - for external validation go to https://github.com/nisreenkhambati/uganda_nasal_cells/tree/main/data copy "nasalcoldata.csv" & "nasalcounts.csv" then paste into our /data folder
-    - Run roc_models_figure4.R
+    - Run `Rscript models/roc_models_figure4.R`
 
 # 4. **GSEA Pathway Analysis**
 
